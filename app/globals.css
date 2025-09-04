@@ -15,6 +15,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
+  --color-main: var(--engineering-orange);
+  --color-secondary: var(--midnight-green);
+  --color-accent: var(--air-force-blue);
 }
 
 @media (prefers-color-scheme: dark) {

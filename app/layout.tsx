@@ -9,7 +9,7 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "Aska Flow",
-  description: "Platform to create workflows for automating tasks and processes in N8N, through AI.",
+  description: "Platform that allows creation and execution of automation workflows through AI, integrated with n8n.",
 };
 
 export default function RootLayout({
