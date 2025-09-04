@@ -12,6 +12,7 @@
     "@ai-sdk/openai": "^2.0.8",
     "@ai-sdk/react": "^2.0.9",
     "ai": "^5.0.9",
+    "lucide-react": "^0.542.0",
     "next": "15.4.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
