@@ -9,7 +9,8 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "Aska Flow",
-  description: "Platform that allows creation and execution of automation workflows through AI, integrated with n8n.",
+  description:
+    "Platform that allows creation and execution of automation workflows through AI, integrated with n8n.",
 };
 
 export default function RootLayout({
@@ -19,11 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className={`${geistSans.variable} antialiased`}>{children}</body>
     </html>
   );
 }
