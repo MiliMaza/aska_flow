@@ -2,14 +2,24 @@
 
 import Image from "next/image";
 import { Menu } from "lucide-react";
+import { useAside } from "./aside-context";
 
 export default function Navbar() {
+  const { toggle, isOpen } = useAside();
+
   return (
-    <nav className="bg-secondary">
+    <nav
+      className={`bg-secondary w-full transition-all duration-300 ${
+        isOpen ? "lg:pl-72" : "lg:pl-0"
+      }`}
+    >
       <div className="flex items-center justify-between p-5">
         {/* Logo and Name */}
         <div className="flex items-center gap-4">
-          <button className="">
+          <button
+            onClick={toggle}
+            className="hover:bg-accent/20 p-2 rounded-lg transition-colors"
+          >
             <Menu className="w-6 h-6" color="#f7f7ffff" />
           </button>
           <div className="flex items-center gap-4">

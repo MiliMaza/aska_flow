@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, BookOpenText, MessageCircle } from "lucide-react";
+import { useAside } from "./aside-context";
 
 const workflowExamples = [
   {
@@ -22,8 +23,14 @@ const workflowExamples = [
 ];
 
 export default function Aside() {
+  const { isOpen } = useAside();
+
   return (
-    <aside className="hidden lg:flex flex-col w-72 bg-secondary text-background p-6 h-screen">
+    <aside
+      className={`${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      } fixed lg:fixed flex flex-col w-72 bg-secondary text-background p-6 h-screen transition-transform duration-300 ease-in-out z-50`}
+    >
       {/* TODO: Add a collapisble aside */}
       {/* "Chat History + icon to collapse/open it" */}
       <div className="flex items-center justify-center mt-1 mb-8">
