@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, BookOpenText, MessageCircle } from "lucide-react";
-import { useSidebar } from "./side-context";
+import { useSidebar } from "@/app/components/layout/side-context";
 
 const workflowExamples = [
   {

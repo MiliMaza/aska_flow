@@ -4,8 +4,8 @@ import { useChat } from "@ai-sdk/react";
 import { useState } from "react";
 import Image from "next/image";
 import { Send, Copy, ExternalLink } from "lucide-react";
-import Navbar from "../components/layout/navbar";
-import Aside from "../components/layout/sidebar";
+import Navbar from "@/app/components/layout/navbar";
+import Aside from "@/app/components/layout/sidebar";
 import { SidebarProvider } from "@/app/components/layout/side-context";
 
 const exampleAutomations = [

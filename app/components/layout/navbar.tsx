@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Menu } from "lucide-react";
-import { useSidebar } from "./side-context";
+import { useSidebar } from "@/app/components/layout/side-context";
 
 export default function Navbar() {
   const { toggle, isOpen } = useSidebar();
