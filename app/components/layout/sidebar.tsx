@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, BookOpenText, MessageCircle } from "lucide-react";
-import { useAside } from "./aside-context";
+import { useSidebar } from "./side-context";
 
 const workflowExamples = [
   {
@@ -22,8 +22,8 @@ const workflowExamples = [
   },
 ];
 
-export default function Aside() {
-  const { isOpen } = useAside();
+export default function Sidebar() {
+  const { isOpen } = useSidebar();
 
   return (
     <aside

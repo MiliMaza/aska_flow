@@ -5,8 +5,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { Send, Copy, ExternalLink } from "lucide-react";
 import Navbar from "../components/layout/navbar";
-import Aside from "../components/layout/aside";
-import { AsideProvider } from "../components/layout/aside-context";
+import Aside from "../components/layout/sidebar";
+import { SidebarProvider } from "@/app/components/layout/side-context";
 
 const exampleAutomations = [
   {
@@ -41,7 +41,7 @@ export default function Home() {
   };
 
   return (
-    <AsideProvider>
+    <SidebarProvider>
       <div className="flex h-screen bg-background">
         <Aside />
         <main className="flex-1 flex flex-col transition-all duration-300">
@@ -190,6 +190,6 @@ export default function Home() {
           </div>
         </main>
       </div>
-    </AsideProvider>
+    </SidebarProvider>
   );
 }
