@@ -9,6 +9,7 @@ import Aside from "@/app/components/layout/sidebar";
 import { SidebarProvider } from "@/app/components/layout/side-context";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
+import { Suggestion, Suggestions } from "@/app/components/ui/suggestion";
 
 const exampleAutomations = [
   {
@@ -79,7 +80,22 @@ export default function Home() {
                   <p className="text-lg italic">
                     Here are some examples of what you can ask:
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                  <div className="w-full max-w-4xl mx-auto">
+                    <Suggestions className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                      {exampleAutomations.map((ex, index) => (
+                        <Suggestion
+                          key={index}
+                          suggestion={ex.title}
+                          onClick={() => {
+                            setInput(ex.title);
+                            setShowExamples(false);
+                          }}
+                          className="w-full"
+                        />
+                      ))}
+                    </Suggestions>
+                  </div>
+                  {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
                     {exampleAutomations.map((example, index) => (
                       <Button
                         variant="outline"
@@ -93,7 +109,7 @@ export default function Home() {
                         {example.title}
                       </Button>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             ) : (
