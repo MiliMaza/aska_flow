@@ -7,6 +7,7 @@ import { Send, Copy, ExternalLink } from "lucide-react";
 import Navbar from "@/app/components/layout/navbar";
 import Aside from "@/app/components/layout/sidebar";
 import { SidebarProvider } from "@/app/components/layout/side-context";
+import { Button } from "@/app/components/ui/button";
 
 const exampleAutomations = [
   {
@@ -79,16 +80,17 @@ export default function Home() {
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
                     {exampleAutomations.map((example, index) => (
-                      <button
+                      <Button
+                        variant="outline"
+                        size="lg"
                         key={index}
-                        className="p-4 text-center border border-main rounded-lg hover:bg-main/10 focus:outline-none focus:ring-1 focus:ring-main transition-colors"
                         onClick={() => {
                           setInput(example.workflow);
                           setShowExamples(false);
                         }}
                       >
                         {example.title}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -179,13 +181,14 @@ export default function Home() {
                 placeholder="Describe the automation you want to achieve..."
                 className="flex-1 p-4 rounded-lg border border-foreground bg-background hover:border-main focus:outline-none focus:ring-1 focus:ring-main transition"
               />
-              <button
+              <Button
+                variant="special"
+                size="icon"
                 type="submit"
-                className="p-4 bg-main text-background rounded-lg hover:bg-secondary transition-colors"
                 disabled={!input.trim()}
               >
                 <Send className="w-5 h-5" />
-              </button>
+              </Button>
             </form>
           </div>
         </main>

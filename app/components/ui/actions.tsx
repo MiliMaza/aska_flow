@@ -29,7 +29,7 @@ export const Action = ({
   label,
   className,
   variant = "ghost",
-  size = "sm",
+  size = "md",
   ...props
 }: ActionProps) => {
   const button = (

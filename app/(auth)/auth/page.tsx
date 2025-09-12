@@ -1,6 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
 import { MoveDown } from "lucide-react";
+import { Button } from "@/app/components/ui/button";
 
 export default function AuthPage() {
   return (
@@ -55,18 +55,20 @@ export default function AuthPage() {
           {/* Auth buttons */}
           {/* TODO: On click open Clerk Modals */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-12">
-            <Link
-              href="/auth"
+            <Button
+              variant="default"
+              size="lg"
               className="bg-main hover:bg-accent text-white px-8 py-3 rounded-md text-lg font-semibold transition-colors"
             >
               Log In
-            </Link>
-            <Link
-              href="/auth"
+            </Button>
+            <Button
+              variant="default"
+              size="lg"
               className="bg-main hover:bg-accent text-white px-8 py-3 rounded-md text-lg font-semibold transition-colors"
             >
               Register
-            </Link>
+            </Button>
           </div>
         </div>
       </div>
