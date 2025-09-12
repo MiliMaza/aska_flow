@@ -131,24 +131,24 @@ export default function Home() {
                               {message.role === "assistant" &&
                                 part.text.includes("workflow") && (
                                   <div className="flex gap-2 pt-4 border-t border-foreground/30">
-                                    <button
+                                    <Button
+                                      variant="default"
+                                      size="sm"
                                       onClick={() => {
                                         /* TODO: Handle copy workflow */
                                       }}
-                                      className="flex items-center gap-2 px-4 py-2 text-sm bg-main text-white rounded hover:bg-accent transition-colors"
                                     >
                                       <Copy className="w-4 h-4" />
                                       Copy Workflow
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                       onClick={() => {
                                         /* TODO: Handle run in N8N */
                                       }}
-                                      className="flex items-center gap-2 px-4 py-2 text-sm bg-main text-white rounded hover:bg-accent transition-colors"
                                     >
                                       <ExternalLink className="w-4 h-4" />
                                       Run Workflow in N8N
-                                    </button>
+                                    </Button>
                                   </div>
                                 )}
                             </>
