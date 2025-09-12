@@ -55,18 +55,10 @@ export default function AuthPage() {
           {/* Auth buttons */}
           {/* TODO: On click open Clerk Modals */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-12">
-            <Button
-              variant="default"
-              size="lg"
-              className="bg-main hover:bg-accent text-white px-8 py-3 rounded-md text-lg font-semibold transition-colors"
-            >
+            <Button variant="default" size="lg" className="px-10 text-lg">
               Log In
             </Button>
-            <Button
-              variant="default"
-              size="lg"
-              className="bg-main hover:bg-accent text-white px-8 py-3 rounded-md text-lg font-semibold transition-colors"
-            >
+            <Button variant="default" size="lg" className="px-10 text-lg">
               Register
             </Button>
           </div>

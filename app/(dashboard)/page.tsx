@@ -8,6 +8,7 @@ import Navbar from "@/app/components/layout/navbar";
 import Aside from "@/app/components/layout/sidebar";
 import { SidebarProvider } from "@/app/components/layout/side-context";
 import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
 
 const exampleAutomations = [
   {
@@ -174,12 +175,11 @@ export default function Home() {
               onSubmit={handleSubmit}
               className="max-w-3xl mx-auto flex gap-4 items-center"
             >
-              <input
+              <Input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.currentTarget.value)}
                 placeholder="Describe the automation you want to achieve..."
-                className="flex-1 p-4 rounded-lg border border-foreground bg-background hover:border-main focus:outline-none focus:ring-1 focus:ring-main transition"
               />
               <Button
                 variant="special"

@@ -3,6 +3,7 @@
 import { Plus, BookOpenText, MessageCircle } from "lucide-react";
 import { useSidebar } from "@/app/components/layout/side-context";
 import { Button } from "@/app/components/ui/button";
+import { Separator } from "@/app/components/ui/separator";
 
 const workflowExamples = [
   {
@@ -38,12 +39,16 @@ export default function Sidebar() {
         <h2 className="text-xl font-semibold">Chat History</h2>
       </div>
 
+      <Separator className="mb-6" />
+
       {/* New Workflow */}
       {/* TODO: Open new chat interface */}
-      <Button variant="default" size="lg" className="mb-6">
+      <Button variant="default" size="lg">
         <Plus className="w-5 h-5" />
         New Workflow
       </Button>
+
+      <Separator className="my-6" />
 
       {/* Past Conversations */}
       {/* TODO: Implement Chat History */}
