@@ -16,7 +16,7 @@ export const Message = ({ className, from, ...props }: MessageProps) => (
     className={cn(
       "group flex w-full items-end justify-end gap-2 py-4",
       from === "user" ? "is-user" : "is-assistant flex-row-reverse justify-end",
-      "[&>div]:max-w-[80%]",
+      "[&>div]:max-w-[85%]",
       className
     )}
     {...props}
@@ -32,10 +32,7 @@ export const MessageContent = ({
 }: MessageContentProps) => (
   <div
     className={cn(
-      "flex flex-col gap-2 overflow-hidden rounded-lg px-4 py-3 text-foreground text-sm",
-      "group-[.is-user]:bg-background group-[.is-user]:text-background",
-      "group-[.is-assistant]:bg-secondary group-[.is-assistant]:text-foreground",
-      "is-user:dark",
+      "flex flex-col gap-2 overflow-hidden rounded-lg px-4 py-3 text-foreground text-md",
       className
     )}
     {...props}
@@ -56,7 +53,7 @@ export const MessageAvatar = ({
   ...props
 }: MessageAvatarProps) => (
   <Avatar className={cn("size-8 ring-1 ring-main", className)} {...props}>
-    <AvatarImage alt="" className="mt-0 mb-0" src={src} />
-    <AvatarFallback>{name?.slice(0, 2) || "ME"}</AvatarFallback>
+    <AvatarImage alt="" className="mt-0 mb-" src={src} />
+    <AvatarFallback>{name?.slice(0, 2).toUpperCase() || "ME"}</AvatarFallback>
   </Avatar>
 );

@@ -30,6 +30,25 @@ export const ConversationContent = ({
   <StickToBottom.Content className={cn("p-4", className)} {...props} />
 );
 
+export type ConversationEmptyStateProps = ComponentProps<"div"> & {
+  title?: string;
+  description?: string;
+  icon?: React.ReactNode;
+};
+
+export const ConversationEmptyState = ({
+  className,
+  ...props
+}: ConversationEmptyStateProps) => (
+  <div
+    className={cn(
+      "flex size-full flex-col items-center justify-center gap-3 p-8 text-center",
+      className
+    )}
+    {...props}
+  ></div>
+);
+
 export type ConversationScrollButtonProps = ComponentProps<typeof Button>;
 
 export const ConversationScrollButton = ({
@@ -46,16 +65,16 @@ export const ConversationScrollButton = ({
     !isAtBottom && (
       <Button
         className={cn(
-          "absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full",
+          "absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full hover:scale-105",
           className
         )}
         onClick={handleScrollToBottom}
         size="icon"
         type="button"
-        variant="outline"
+        variant="default"
         {...props}
       >
-        <ArrowDownIcon className="size-4" />
+        <ArrowDownIcon className="size-5" />
       </Button>
     )
   );
