@@ -10,6 +10,12 @@ import { SidebarProvider } from "@/app/components/layout/side-context";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Suggestion, Suggestions } from "@/app/components/ui/suggestion";
+import { Actions, Action } from "@/app/components/ui/actions";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/app/components/ui/tooltip";
 
 const exampleAutomations = [
   {
@@ -95,21 +101,6 @@ export default function Home() {
                       ))}
                     </Suggestions>
                   </div>
-                  {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-                    {exampleAutomations.map((example, index) => (
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        key={index}
-                        onClick={() => {
-                          setInput(example.workflow);
-                          setShowExamples(false);
-                        }}
-                      >
-                        {example.title}
-                      </Button>
-                    ))}
-                  </div> */}
                 </div>
               </div>
             ) : (
@@ -147,26 +138,34 @@ export default function Home() {
                               </div>
                               {message.role === "assistant" &&
                                 part.text.includes("workflow") && (
-                                  <div className="flex gap-2 pt-4 border-t border-foreground/30">
-                                    <Button
-                                      variant="default"
-                                      size="sm"
-                                      onClick={() => {
-                                        /* TODO: Handle copy workflow */
-                                      }}
+                                  <Actions className="flex gap-2 pt-4 border-t border-foreground/30">
+                                    <Action
+                                      label="Copy Workflow"
+                                      onClick={() => {}}
                                     >
-                                      <Copy className="w-4 h-4" />
-                                      Copy Workflow
-                                    </Button>
-                                    <Button
-                                      onClick={() => {
-                                        /* TODO: Handle run in N8N */
-                                      }}
+                                      <Tooltip>
+                                        <TooltipTrigger>
+                                          <Copy className="size-4" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Copy Workflow</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </Action>
+                                    <Action
+                                      label="Run Workflow in N8N"
+                                      onClick={() => {}}
                                     >
-                                      <ExternalLink className="w-4 h-4" />
-                                      Run Workflow in N8N
-                                    </Button>
-                                  </div>
+                                      <Tooltip>
+                                        <TooltipTrigger>
+                                          <ExternalLink className="size-4" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Run Workflow in N8N</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </Action>
+                                  </Actions>
                                 )}
                             </>
                           )}
