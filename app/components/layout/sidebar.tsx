@@ -2,6 +2,8 @@
 
 import { Plus, BookOpenText, MessageCircle } from "lucide-react";
 import { useSidebar } from "@/app/components/layout/side-context";
+import { Button } from "@/app/components/ui/button";
+import { Separator } from "@/app/components/ui/separator";
 
 const workflowExamples = [
   {
@@ -37,12 +39,16 @@ export default function Sidebar() {
         <h2 className="text-xl font-semibold">Chat History</h2>
       </div>
 
+      <Separator className="mb-6" />
+
       {/* New Workflow */}
       {/* TODO: Open new chat interface */}
-      <button className="flex items-center justify-center gap-2 w-full p-3 mb-6 bg-main rounded-lg hover:bg-accent transition-colors">
+      <Button variant="default" size="lg">
         <Plus className="w-5 h-5" />
         New Workflow
-      </button>
+      </Button>
+
+      <Separator className="my-6" />
 
       {/* Past Conversations */}
       {/* TODO: Implement Chat History */}
@@ -50,26 +56,29 @@ export default function Sidebar() {
         <h3 className="text-sm font-medium px-2">CHATS</h3>
         <div className="space-y-4">
           {workflowExamples.map((workflow, index) => (
-            <button
+            <Button
+              variant="secondary"
+              size="md"
               key={index}
-              className="flex items-center justify-center gap-2 w-full p-3 text-foreground rounded-lg bg-background hover:bg-accent hover:text-background transition-colors group"
+              className="w-full group"
             >
               <MessageCircle className="" />
               <h4 className="font-medium">{workflow.title}</h4>
-            </button>
+            </Button>
           ))}
         </div>
       </div>
 
       {/* N8N Docs */}
       <div className="flex-grow" />
-      <button
-        className="flex items-center justify-center gap-2 w-full p-2 mb-6 bg-main rounded-lg hover:bg-accent transition-colors"
+      <Button
+        variant="default"
+        size="md"
         onClick={() => window.open("https://docs.n8n.io/", "_blank")}
       >
         <BookOpenText className="w-5 h-5" />
         Check N8N Docs
-      </button>
+      </Button>
     </aside>
   );
 }

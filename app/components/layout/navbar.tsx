@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Menu } from "lucide-react";
 import { useSidebar } from "@/app/components/layout/side-context";
+import { Button } from "@/app/components/ui/button";
 
 export default function Navbar() {
   const { toggle, isOpen } = useSidebar();
@@ -16,12 +17,9 @@ export default function Navbar() {
       <div className="flex items-center justify-between p-5">
         {/* Logo and Name */}
         <div className="flex items-center gap-4">
-          <button
-            onClick={toggle}
-            className="hover:bg-accent/20 p-2 rounded-lg transition-colors"
-          >
-            <Menu className="w-6 h-6" color="#f7f7ffff" />
-          </button>
+          <Button variant="ghost" size="icon" onClick={toggle}>
+            <Menu className="w-6 h-6" />
+          </Button>
           <div className="flex items-center gap-4">
             <Image
               src="/Logo.png"
