@@ -4,6 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { useState } from "react";
 import Image from "next/image";
 import { Send, Copy, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 import Navbar from "@/app/components/layout/navbar";
 import Aside from "@/app/components/layout/sidebar";
 import { SidebarProvider } from "@/app/components/layout/side-context";
@@ -164,7 +165,11 @@ export default function Home() {
                                                   // Copy JSON to clipboard
                                                   navigator.clipboard.writeText(
                                                     jsonMatch[0]
-                                                  );
+                                                  ).then(() => {
+                                                    toast.success("Workflow copied to clipboard!");
+                                                  }).catch(() => {
+                                                    toast.error("Failed to copy workflow");
+                                                  });
                                                 }
                                               }}
                                             >
