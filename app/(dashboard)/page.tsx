@@ -65,9 +65,9 @@ export default function Home() {
       <div className="flex h-screen bg-background">
         <Aside />
         <main className="flex flex-col flex-1 transition-all duration-300">
-          <Navbar/>
+          <Navbar />
           <div className="flex overflow-y-auto flex-1">
-            <Conversation >
+            <Conversation>
               <ConversationContent>
                 {showExamples && messages.length === 0 ? (
                   // When no messages, show welcome and examples
@@ -150,14 +150,26 @@ export default function Home() {
                                         {part.text}
                                       </div>
                                       {message.role === "assistant" &&
-                                        part.text.includes("workflow") && (
+                                        part.text.includes("json") && (
                                           <Actions className="flex gap-2 pt-2 border-t border-foreground/30">
                                             <Action
                                               label="Copy Workflow"
-                                              onClick={() => {}}
+                                              onClick={() => {
+                                                // Find JSON in the message text
+                                                const jsonMatch =
+                                                  part.text.match(
+                                                    /\{[\s\S]*\}/
+                                                  );
+                                                if (jsonMatch) {
+                                                  // Copy JSON to clipboard
+                                                  navigator.clipboard.writeText(
+                                                    jsonMatch[0]
+                                                  );
+                                                }
+                                              }}
                                             >
                                               <Tooltip>
-                                                <TooltipTrigger>
+                                                <TooltipTrigger asChild>
                                                   <Copy className="size-4" />
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -170,7 +182,7 @@ export default function Home() {
                                               onClick={() => {}}
                                             >
                                               <Tooltip>
-                                                <TooltipTrigger>
+                                                <TooltipTrigger asChild>
                                                   <ExternalLink className="size-4" />
                                                 </TooltipTrigger>
                                                 <TooltipContent>
