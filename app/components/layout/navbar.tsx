@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Menu } from "lucide-react";
 import { useSidebar } from "@/app/components/layout/side-context";
 import { Button } from "@/app/components/ui/button";
+import { UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   const { toggle, isOpen } = useSidebar();
@@ -20,7 +21,10 @@ export default function Navbar() {
           <Button variant="ghost" size="icon" onClick={toggle}>
             <Menu className="w-6 h-6" />
           </Button>
-          <div className="flex items-center gap-4">
+          <div
+            className="flex items-center gap-4 cursor-pointer"
+            onClick={() => window.location.reload()}
+          >
             <Image
               src="/Logo.png"
               alt="Aska Flow Logo"
@@ -35,10 +39,7 @@ export default function Navbar() {
 
         {/* User profile */}
         <div className="flex items-center gap-4">
-          {/* TODO: Implement Clerk Profile Button */}
-          <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-background font-semibold">
-            U
-          </div>
+          <UserButton />
         </div>
       </div>
     </nav>

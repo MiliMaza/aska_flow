@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { MoveDown } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 
 export default function AuthPage() {
   return (
@@ -55,12 +58,17 @@ export default function AuthPage() {
           {/* Auth buttons */}
           {/* TODO: On click open Clerk Modals */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-12">
-            <Button variant="default" size="lg" className="px-10 text-lg">
-              Log In
-            </Button>
-            <Button variant="default" size="lg" className="px-10 text-lg">
-              Register
-            </Button>
+            <SignInButton mode="modal">
+              <Button variant="default" size="lg" className="px-10 text-lg">
+                Log In
+              </Button>
+            </SignInButton>
+
+            <SignUpButton mode="modal">
+              <Button variant="default" size="lg" className="px-10 text-lg">
+                Register
+              </Button>
+            </SignUpButton>
           </div>
         </div>
       </div>
