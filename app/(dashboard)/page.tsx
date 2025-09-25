@@ -28,6 +28,7 @@ import {
   MessageContent,
   MessageAvatar,
 } from "@/app/components/ui/message";
+import { useUser } from "@clerk/nextjs";
 
 const exampleAutomations = [
   {
@@ -52,6 +53,7 @@ export default function Home() {
   const [input, setInput] = useState("");
   const { messages, sendMessage } = useChat();
   const [showExamples, setShowExamples] = useState(true);
+  const { user } = useUser();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -163,13 +165,18 @@ export default function Home() {
                                                   );
                                                 if (jsonMatch) {
                                                   // Copy JSON to clipboard
-                                                  navigator.clipboard.writeText(
-                                                    jsonMatch[0]
-                                                  ).then(() => {
-                                                    toast.success("Workflow copied to clipboard!");
-                                                  }).catch(() => {
-                                                    toast.error("Failed to copy workflow");
-                                                  });
+                                                  navigator.clipboard
+                                                    .writeText(jsonMatch[0])
+                                                    .then(() => {
+                                                      toast.success(
+                                                        "Workflow copied to clipboard!"
+                                                      );
+                                                    })
+                                                    .catch(() => {
+                                                      toast.error(
+                                                        "Failed to copy workflow"
+                                                      );
+                                                    });
                                                 }
                                               }}
                                             >
@@ -203,9 +210,11 @@ export default function Home() {
                               ))}
                             </div>
                             {message.role === "user" && (
-                              // TODO: Change the icon based on user's account icon
                               <div className="flex-shrink-0">
-                                <MessageAvatar src="" name="User" />
+                                <MessageAvatar
+                                  src={user?.imageUrl || ""}
+                                  name={user?.fullName || "User"}
+                                />
                               </div>
                             )}
                           </div>
