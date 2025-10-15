@@ -1,6 +1,7 @@
 import { openai } from "@ai-sdk/openai";
 import { streamText, UIMessage, convertToModelMessages } from "ai";
 import { n8nWorkflowSchema } from "@/lib/workflow-schema";
+import { securityScan } from "@/lib/security-scanner";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -118,6 +119,13 @@ export async function POST(req: Request) {
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
+  }
+
+  // Validate against security rules
+  const validationSecurity = securityScan(validationResult.data);
+  if (!validationSecurity.isSafe) {
+    console.error('Security scan failed:', validationSecurity.reason);
+    return new Response(JSON.stringify({ error: validationSecurity.reason }), { status: 500 });
   }
 
   // After all validations, stream the response back
