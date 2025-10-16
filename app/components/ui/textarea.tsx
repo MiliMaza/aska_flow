@@ -7,7 +7,7 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
     <textarea
       data-slot="textarea"
       className={cn(
-        "border-main placeholder:text-foreground focus-visible:border-main focus-visible:ring-main/50 aria-invalid:ring-main/20 aria-invalid:border-main flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "border border-foreground placeholder:text-foreground/80 focus:border-main field-sizing-content w-full rounded-lg p-4 text-base shadow-xs outline-none",
         className
       )}
       {...props}
