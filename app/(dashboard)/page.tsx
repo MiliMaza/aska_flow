@@ -9,7 +9,7 @@ import Navbar from "@/app/components/layout/navbar";
 import Aside from "@/app/components/layout/sidebar";
 import { SidebarProvider } from "@/app/components/layout/side-context";
 import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
+import { Textarea } from "@/app/components/ui/textarea";
 import { Suggestion, Suggestions } from "@/app/components/ui/suggestion";
 import { Actions, Action } from "@/app/components/ui/actions";
 import {
@@ -153,7 +153,9 @@ export default function Home() {
                                         {part.text}
                                       </div>
                                       {message.role === "assistant" &&
-                                        part.text.includes("json") && (
+                                        part.text.includes("json") &&
+                                        part.text.match(/\{[\s\S]*\}/) &&
+                                        !/\.\.\.\s*$/.test(part.text) && (
                                           <Actions className="flex gap-2 pt-2 border-t border-foreground/30">
                                             <Action
                                               label="Copy Workflow"
@@ -234,11 +236,11 @@ export default function Home() {
               onSubmit={handleSubmit}
               className="max-w-3xl mx-auto flex gap-4 items-center"
             >
-              <Input
-                type="text"
+              <Textarea
                 value={input}
                 onChange={(e) => setInput(e.currentTarget.value)}
                 placeholder="Describe the automation you want to achieve..."
+                className="min-h-[50px] max-h-[150px] resize-none"
               />
               <Button
                 variant="special"
