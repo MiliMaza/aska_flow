@@ -52,7 +52,7 @@ const exampleAutomations = [
 export default function Home() {
   const [input, setInput] = useState("");
   const { messages, sendMessage } = useChat();
-  const [showExamples, setShowExamples] = useState(true);
+  const [showExamples] = useState(true);
   const { user } = useUser();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -60,7 +60,6 @@ export default function Home() {
     if (!input.trim()) return;
     sendMessage({ text: input });
     setInput("");
-    setShowExamples(false);
   };
 
   return (
@@ -112,7 +111,6 @@ export default function Home() {
                                 suggestion={ex.title}
                                 onClick={() => {
                                   setInput(ex.title);
-                                  setShowExamples(false);
                                 }}
                                 className="w-full"
                               />
