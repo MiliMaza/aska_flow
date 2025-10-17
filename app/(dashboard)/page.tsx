@@ -29,6 +29,7 @@ import {
   MessageAvatar,
 } from "@/app/components/ui/message";
 import { useUser } from "@clerk/nextjs";
+import { Loader } from "@/app/components/ui/loader";
 
 const exampleAutomations = [
   {
@@ -51,9 +52,11 @@ const exampleAutomations = [
 
 export default function Home() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage } = useChat();
+  const { messages, sendMessage, status } = useChat();
   const [showExamples] = useState(true);
   const { user } = useUser();
+
+  const isLoading = status === "submitted" || status === "streaming";
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -134,7 +137,7 @@ export default function Home() {
                               />
                             )}
                             <div
-                              className={`p-4 rounded-lg max-w-max border border-main ${
+                              className={`p-4 rounded-lg max-w-[90%] border border-main ${
                                 message.role === "user"
                                   ? "bg-main/10"
                                   : "bg-white"
@@ -221,6 +224,17 @@ export default function Home() {
                         </MessageContent>
                       </Message>
                     ))}
+
+                    {isLoading && (
+                      <div className="flex items-center justify-center">
+                        <div className="flex items-center gap-2 text-foreground">
+                          <Loader />
+                          <span className="italic">
+                            Generating your workflow, please wait...
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </ConversationContent>
