@@ -1,7 +1,12 @@
-import { openai } from "@ai-sdk/openai";
+// import { openai } from "@ai-sdk/openai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { streamText, UIMessage, convertToModelMessages } from "ai";
 import { n8nWorkflowSchema } from "@/lib/workflow-schema";
 import { securityScan } from "@/lib/security-scanner";
+
+const openrouter = createOpenRouter({
+  apiKey: "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",
+});
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -24,7 +29,7 @@ export async function POST(req: Request) {
   }
 
   const result = streamText({
-    model: openai("gpt-4o"),
+    model: openrouter.chat("openai/gpt-oss-20b"),
     system: `
     You are an expert generator of workflows in JSON format for the n8n platform.
     Your ONLY task is to transform the user's natural language instructions into a valid, functional, and secure n8n workflow.
