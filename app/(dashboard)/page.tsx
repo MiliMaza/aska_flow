@@ -150,11 +150,38 @@ export default function Home() {
                                 >
                                   {part.type === "text" && (
                                     <>
-                                      <div className="whitespace-pre-wrap">
-                                        {part.text}
-                                      </div>
                                       {message.role === "assistant" &&
-                                        part.text.includes("json") &&
+                                      part.text.match(/\{[\s\S]*\}/) ? (
+                                        <pre className="overflow-auto p-4 rounded-lg bg-background border border-foreground/20">
+                                          <code>
+                                            {(() => {
+                                              try {
+                                                const jsonMatch =
+                                                  part.text.match(
+                                                    /\{[\s\S]*\}/
+                                                  );
+                                                if (!jsonMatch)
+                                                  return part.text;
+                                                const parsed = JSON.parse(
+                                                  jsonMatch[0]
+                                                );
+                                                return JSON.stringify(
+                                                  parsed,
+                                                  null,
+                                                  2
+                                                );
+                                              } catch {
+                                                return part.text;
+                                              }
+                                            })()}
+                                          </code>
+                                        </pre>
+                                      ) : (
+                                        <div className="whitespace-pre-wrap">
+                                          {part.text}
+                                        </div>
+                                      )}
+                                      {message.role === "assistant" &&
                                         part.text.match(/\{[\s\S]*\}/) &&
                                         !/\.\.\.\s*$/.test(part.text) && (
                                           <Actions className="flex gap-2 pt-2 border-t border-foreground/30">
