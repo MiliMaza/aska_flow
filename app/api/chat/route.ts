@@ -5,7 +5,7 @@ import { n8nWorkflowSchema } from "@/lib/workflow-schema";
 import { securityScan } from "@/lib/security-scanner";
 
 const openrouter = createOpenRouter({
-  apiKey: "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",
+  apiKey: process.env.OPENROUTER_API_KEY || "",
 });
 
 // Allow streaming responses up to 30 seconds
