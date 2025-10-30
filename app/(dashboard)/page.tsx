@@ -5,6 +5,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Send, Copy, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { N8NConnectionDialog } from "@/app/components/chat/n8n-connection-dialog";
 import Navbar from "@/app/components/layout/navbar";
 import Aside from "@/app/components/layout/sidebar";
 import { SidebarProvider } from "@/app/components/layout/side-context";
@@ -54,7 +55,15 @@ export default function Home() {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status } = useChat();
   const [showExamples] = useState(true);
+  const [showN8NDialog, setShowN8NDialog] = useState(false);
   const { user } = useUser();
+
+  const handleN8NConnection = (instanceUrl: string, apiKey: string) => {
+    // TODO: Implement the connection to N8N
+    console.log("Connecting to N8N:", { instanceUrl, apiKey });
+    toast.success("Successfully connected to N8N!");
+    setShowN8NDialog(false);
+  };
 
   const isLoading = status === "submitted" || status === "streaming";
 
@@ -71,6 +80,11 @@ export default function Home() {
         <Aside />
         <main className="flex flex-col flex-1 transition-all duration-300">
           <Navbar />
+          <N8NConnectionDialog
+            isOpen={showN8NDialog}
+            onClose={() => setShowN8NDialog(false)}
+            onSubmit={handleN8NConnection}
+          />
           <div className="flex overflow-y-auto flex-1">
             <Conversation>
               <ConversationContent>
@@ -221,7 +235,9 @@ export default function Home() {
                                             </Action>
                                             <Action
                                               label="Run Workflow in N8N"
-                                              onClick={() => {}}
+                                              onClick={() =>
+                                                setShowN8NDialog(true)
+                                              }
                                             >
                                               <Tooltip>
                                                 <TooltipTrigger asChild>
