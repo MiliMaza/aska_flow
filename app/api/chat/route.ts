@@ -1,4 +1,3 @@
-// import { openai } from "@ai-sdk/openai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { streamText, UIMessage, convertToModelMessages } from "ai";
 import { n8nWorkflowSchema } from "@/lib/workflow-schema";
@@ -7,13 +6,6 @@ import { securityScan } from "@/lib/security-scanner";
 const openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY || "",
 });
-
-// const google = createGoogleGenerativeAI({
-//   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY || "",
-// });
-
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
 
 // Limit input length to prevent excessive usage
 const MAX_INPUT_LENGTH = 2000;
@@ -84,21 +76,16 @@ export async function POST(req: Request) {
        - Include all required parameters per node type
        - Use correct parameter types as per n8n docs
        - Have logical x,y positions (start: [100,300], increment +200 x)
-       - Include proper error handling
-       - Use latest stable typeVersions
 
     3. CONNECTIONS MUST:
        - Create valid node chains
        - Use correct input/output indices
        - Handle all node outputs
-       - Include error handling paths where needed
 
     4. SECURITY REQUIREMENTS:
        - Use ONLY n8n's credential system
        - NEVER include actual API keys/secrets
        - Validate all inputs
-       - Include proper error handling
-       - Follow least-privilege principle
 
     5. VALIDATION:
        - All JSON must be strictly typed
