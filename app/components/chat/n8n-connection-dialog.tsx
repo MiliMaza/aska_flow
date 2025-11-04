@@ -34,7 +34,7 @@ export function N8NConnectionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent aria-describedby="">
         <DialogHeader>
           <DialogTitle>Connect to N8N</DialogTitle>
         </DialogHeader>
