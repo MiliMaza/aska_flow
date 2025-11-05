@@ -63,14 +63,43 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [showExamples] = useState(true);
   const [showN8NDialog, setShowN8NDialog] = useState(false);
+  const [workflowToRun, setWorkflowToRun] = useState<object | null>(null);
   const { user } = useUser();
 
   // Handle N8N connection
-  const handleN8NConnection = (instanceUrl: string, apiKey: string) => {
-    // TODO: Implement the connection to N8N
-    console.log("Connecting to N8N:", { instanceUrl, apiKey });
-    toast.success("Successfully connected to N8N!");
-    setShowN8NDialog(false);
+  const handleN8NConnection = async (instanceUrl: string, apiKey: string) => {
+    if (!workflowToRun) {
+      toast.error("No workflow selected to run.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/n8n/run-workflow", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          instanceUrl,
+          apiKey,
+          workflowJson: workflowToRun,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error(result.error || "Failed to connect to n8n.");
+        return;
+      }
+
+      toast.success(result.message || "Workflow created successfully!");
+      setShowN8NDialog(false);
+      setWorkflowToRun(null); // Reset after successful run
+    } catch (error) {
+      console.error("Failed to run workflow:", error);
+      toast.error("An unexpected error occurred while connecting to n8n.");
+    }
   };
 
   // Handle form submission
@@ -286,10 +315,34 @@ export default function Home() {
                                             </Action>
                                             <Action
                                               label="Run Workflow in N8N"
-                                              onClick={
-                                                () => setShowN8NDialog(true)
-                                                // TODO: Connect to N8N
-                                              }
+                                              onClick={() => {
+                                                const jsonMatch =
+                                                  part.text.match(
+                                                    /\{[\s\S]*\}/
+                                                  );
+                                                if (jsonMatch) {
+                                                  try {
+                                                    const workflowJson =
+                                                      JSON.parse(jsonMatch[0]);
+                                                    setWorkflowToRun(
+                                                      workflowJson
+                                                    );
+                                                    setShowN8NDialog(true);
+                                                  } catch (error) {
+                                                    toast.error(
+                                                      "Failed to parse workflow JSON."
+                                                    );
+                                                    console.error(
+                                                      "JSON parsing error:",
+                                                      error
+                                                    );
+                                                  }
+                                                } else {
+                                                  toast.error(
+                                                    "No valid workflow JSON found in the message."
+                                                  );
+                                                }
+                                              }}
                                             >
                                               <Tooltip>
                                                 <TooltipTrigger asChild>
