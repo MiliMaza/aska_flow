@@ -59,17 +59,12 @@ export async function POST(req: Request) {
            }
          },
          "settings": {
-           "executionOrder": "string (v1)",
            "saveExecutionProgress": boolean,
            "saveManualExecutions": boolean,
-           "callerPolicy": "string (workflowsFromSameOwner)",
            "errorWorkflow": "string (optional)",
            "timezone": "string (UTC)",
            "saveDataErrorExecution": "string (all)"
          },
-         "pinData": {},
-         "versionId": number,
-         "active": boolean
        }
 
     2. NODES MUST:
