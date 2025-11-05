@@ -1,7 +1,8 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText, UIMessage, convertToModelMessages } from "ai";
+import { generateText, UIMessage, convertToModelMessages } from "ai";
 import { n8nWorkflowSchema } from "@/lib/workflow-schema";
 import { securityScan } from "@/lib/security-scanner";
+import { NextResponse } from "next/server";
 
 const openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY || "",
@@ -11,22 +12,23 @@ const openrouter = createOpenRouter({
 const MAX_INPUT_LENGTH = 2000;
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  try {
+    const { messages }: { messages: UIMessage[] } = await req.json();
 
-  const latestUserInput = messages[messages.length - 1]?.parts.find(
-    (part) => part.type === "text"
-  )?.text;
+    const latestUserInput = messages[messages.length - 1]?.parts.find(
+      (part) => part.type === "text"
+    )?.text;
 
-  if (
-    typeof latestUserInput !== "string" ||
-    latestUserInput.length > MAX_INPUT_LENGTH
-  ) {
-    return new Response("Invalid input", { status: 400 });
-  }
+    if (
+      typeof latestUserInput !== "string" ||
+      latestUserInput.length > MAX_INPUT_LENGTH
+    ) {
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    }
 
-  const result = streamText({
-    model: openrouter.chat("openai/gpt-oss-20b"),
-    system: `
+    const { text } = await generateText({
+      model: openrouter.chat("openai/gpt-oss-20b"),
+      system: `
     You are an expert n8n workflow creator, specializing in generating precise, production-ready workflows that strictly follow n8n's official specifications.
 
     Your ONLY purpose is to transform natural language instructions into valid n8n workflows, following these CRITICAL specifications:
@@ -108,89 +110,74 @@ export async function POST(req: Request) {
 
     After generating the workflow JSON, include a note about any required credentials or configuration steps.
     `,
-    messages: convertToModelMessages(messages),
-    maxRetries: 0,
-    temperature: 0,
-  });
+      messages: convertToModelMessages(messages),
+      maxRetries: 0,
+      temperature: 0,
+    });
 
-  // To validate the output we need the full text
-  const text = await result.text;
-
-  // Extract JSON from the text
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    return new Response(
-      JSON.stringify({ error: "Model did not return a valid JSON object." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  let workflowJson;
-  try {
-    // Check if JSON is valid
-    workflowJson = JSON.parse(jsonMatch[0]);
-  } catch (error) {
-    console.error("JSON parsing failed:", error);
-    return new Response(
-      JSON.stringify({ error: "Generated content is not valid JSON." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  // Validate against n8n workflow schema
-  const validationResult = n8nWorkflowSchema.safeParse(workflowJson);
-  if (!validationResult.success) {
-    // If the response is an error message (which means LLM detected non-workflow request)
-    if (workflowJson.error) {
-      // Stream the error message back to the user
-      const responseStream = new TransformStream({
-        transform(chunk, controller) {
-          controller.enqueue(chunk);
-        },
-      });
-      const response = await result.toUIMessageStreamResponse();
-      if (!response.body) {
-        return new Response("No response body", { status: 500 });
-      }
-      return new Response(response.body.pipeThrough(responseStream), {
-        headers: response.headers,
-      });
+    // Extract JSON from the text
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return NextResponse.json(
+        { error: "Model did not return a valid JSON object." },
+        { status: 500 }
+      );
     }
 
-    // If it's a failed workflow generation, log the error
-    console.error(
-      "Schema validation failed:",
-      validationResult.error.flatten()
-    );
-    return new Response(
-      JSON.stringify({
-        error: "Generated workflow does not match the required n8n structure.",
-      }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  } // Validate against security rules
-  const validationSecurity = securityScan(validationResult.data);
-  if (!validationSecurity.isSafe) {
-    console.error("Security scan failed:", validationSecurity.reason);
-    return new Response(JSON.stringify({ error: validationSecurity.reason }), {
-      status: 500,
-    });
+    let workflowJson;
+    try {
+      // Check if JSON is valid
+      workflowJson = JSON.parse(jsonMatch[0]);
+    } catch (error) {
+      console.error("JSON parsing failed:", error);
+      return NextResponse.json(
+        { error: "Generated content is not valid JSON." },
+        { status: 500 }
+      );
+    }
+
+    // Validate against n8n workflow schema
+    const validationResult = n8nWorkflowSchema.safeParse(workflowJson);
+    if (!validationResult.success) {
+      // If the response is an error message (LLM detected non-workflow request)
+      if (workflowJson.error) {
+        return NextResponse.json({ content: jsonMatch[0] });
+      }
+
+      // If the response is a failed workflow generation
+      console.error(
+        "Schema validation failed:",
+        validationResult.error.flatten()
+      );
+      return NextResponse.json(
+        {
+          error:
+            "Generated workflow does not match the required n8n structure.",
+        },
+        { status: 500 }
+      );
+    }
+
+    // Validate against security rules
+    const validationSecurity = securityScan(validationResult.data);
+    if (!validationSecurity.isSafe) {
+      console.error("Security scan failed:", validationSecurity.reason);
+      return NextResponse.json(
+        { error: validationSecurity.reason },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    // After all validations, return full response
+    return NextResponse.json({ content: text });
+  } catch (error) {
+    console.error("Error in POST /api/chat:", error);
+    let errorMessage = "An unexpected error occurred.";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
-
-  // After all validations, stream the response back
-  const responseStream = new TransformStream({
-    transform(chunk, controller) {
-      controller.enqueue(chunk);
-    },
-  });
-
-  const response = await result.toUIMessageStreamResponse();
-  if (!response.body) {
-    return new Response("No response body", { status: 500 });
-  }
-
-  const finalStream = response.body.pipeThrough(responseStream);
-  return new Response(finalStream, {
-    headers: response.headers,
-  });
 }

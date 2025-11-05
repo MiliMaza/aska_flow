@@ -1,6 +1,5 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
 import { useState } from "react";
 import Image from "next/image";
 import { Send, Copy, ExternalLink } from "lucide-react";
@@ -32,6 +31,13 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { Loader } from "@/app/components/ui/loader";
 
+// Message structure
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  parts: Array<{ type: "text"; text: string }>;
+}
+
 const exampleAutomations = [
   {
     title: "Save Gmail attachments to Google Drive",
@@ -53,11 +59,13 @@ const exampleAutomations = [
 
 export default function Home() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status } = useChat();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [showExamples] = useState(true);
   const [showN8NDialog, setShowN8NDialog] = useState(false);
   const { user } = useUser();
 
+  // Handle N8N connection
   const handleN8NConnection = (instanceUrl: string, apiKey: string) => {
     // TODO: Implement the connection to N8N
     console.log("Connecting to N8N:", { instanceUrl, apiKey });
@@ -65,13 +73,56 @@ export default function Home() {
     setShowN8NDialog(false);
   };
 
-  const isLoading = status === "submitted" || status === "streaming";
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim()) return;
-    sendMessage({ text: input });
+
+    const newUserMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      parts: [{ type: "text", text: input }],
+    };
+
+    const newMessages = [...messages, newUserMessage];
+    setMessages(newMessages);
     setInput("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages: newMessages }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || "An unknown error occurred.");
+        // Revert messages state if API call fails
+        setMessages(messages);
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        parts: [{ type: "text", text: data.content }],
+      };
+
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    } catch (error) {
+      console.error("Failed to fetch:", error);
+      toast.error("Failed to connect to the server.");
+      setMessages(messages);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -235,8 +286,9 @@ export default function Home() {
                                             </Action>
                                             <Action
                                               label="Run Workflow in N8N"
-                                              onClick={() =>
-                                                setShowN8NDialog(true)
+                                              onClick={
+                                                () => setShowN8NDialog(true)
+                                                // TODO: Connect to N8N
                                               }
                                             >
                                               <Tooltip>
@@ -268,6 +320,7 @@ export default function Home() {
                       </Message>
                     ))}
 
+                    {/* When user is waiting for the LLM's answer... */}
                     {isLoading && (
                       <div className="flex items-center justify-center">
                         <div className="flex items-center gap-2 text-foreground">
