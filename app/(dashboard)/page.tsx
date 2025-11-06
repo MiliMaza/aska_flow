@@ -1,15 +1,15 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
 import { useState } from "react";
 import Image from "next/image";
 import { Send, Copy, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { N8NConnectionDialog } from "@/app/components/chat/n8n-connection-dialog";
 import Navbar from "@/app/components/layout/navbar";
 import Aside from "@/app/components/layout/sidebar";
 import { SidebarProvider } from "@/app/components/layout/side-context";
 import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
+import { Textarea } from "@/app/components/ui/textarea";
 import { Suggestion, Suggestions } from "@/app/components/ui/suggestion";
 import { Actions, Action } from "@/app/components/ui/actions";
 import {
@@ -29,6 +29,14 @@ import {
   MessageAvatar,
 } from "@/app/components/ui/message";
 import { useUser } from "@clerk/nextjs";
+import { Loader } from "@/app/components/ui/loader";
+
+// Message structure
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  parts: Array<{ type: "text"; text: string }>;
+}
 
 const exampleAutomations = [
   {
@@ -51,16 +59,99 @@ const exampleAutomations = [
 
 export default function Home() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage } = useChat();
-  const [showExamples, setShowExamples] = useState(true);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showExamples] = useState(true);
+  const [showN8NDialog, setShowN8NDialog] = useState(false);
+  const [workflowToRun, setWorkflowToRun] = useState<object | null>(null);
   const { user } = useUser();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Handle N8N connection
+  const handleN8NConnection = async (instanceUrl: string, apiKey: string) => {
+    if (!workflowToRun) {
+      toast.error("No workflow selected to run.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/n8n/run-workflow", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          instanceUrl,
+          apiKey,
+          workflowJson: workflowToRun,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error(result.error || "Failed to connect to n8n.");
+        return;
+      }
+
+      toast.success(result.message || "Workflow created successfully!");
+      setShowN8NDialog(false);
+      setWorkflowToRun(null); // Reset after successful run
+    } catch (error) {
+      console.error("Failed to run workflow:", error);
+      toast.error("An unexpected error occurred while connecting to n8n.");
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim()) return;
-    sendMessage({ text: input });
+
+    const newUserMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      parts: [{ type: "text", text: input }],
+    };
+
+    const newMessages = [...messages, newUserMessage];
+    setMessages(newMessages);
     setInput("");
-    setShowExamples(false);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages: newMessages }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || "An unknown error occurred.");
+        // Revert messages state if API call fails
+        setMessages(messages);
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        parts: [{ type: "text", text: data.content }],
+      };
+
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    } catch (error) {
+      console.error("Failed to fetch:", error);
+      toast.error("Failed to connect to the server.");
+      setMessages(messages);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -69,6 +160,11 @@ export default function Home() {
         <Aside />
         <main className="flex flex-col flex-1 transition-all duration-300">
           <Navbar />
+          <N8NConnectionDialog
+            isOpen={showN8NDialog}
+            onClose={() => setShowN8NDialog(false)}
+            onSubmit={handleN8NConnection}
+          />
           <div className="flex overflow-y-auto flex-1">
             <Conversation>
               <ConversationContent>
@@ -112,7 +208,6 @@ export default function Home() {
                                 suggestion={ex.title}
                                 onClick={() => {
                                   setInput(ex.title);
-                                  setShowExamples(false);
                                 }}
                                 className="w-full"
                               />
@@ -136,7 +231,7 @@ export default function Home() {
                               />
                             )}
                             <div
-                              className={`p-4 rounded-lg max-w-max border border-main ${
+                              className={`p-4 rounded-lg max-w-[90%] border border-main ${
                                 message.role === "user"
                                   ? "bg-main/10"
                                   : "bg-white"
@@ -149,11 +244,40 @@ export default function Home() {
                                 >
                                   {part.type === "text" && (
                                     <>
-                                      <div className="whitespace-pre-wrap">
-                                        {part.text}
-                                      </div>
                                       {message.role === "assistant" &&
-                                        part.text.includes("json") && (
+                                      part.text.match(/\{[\s\S]*\}/) ? (
+                                        <pre className="overflow-auto p-4 rounded-lg bg-background border border-foreground/20">
+                                          <code>
+                                            {(() => {
+                                              try {
+                                                const jsonMatch =
+                                                  part.text.match(
+                                                    /\{[\s\S]*\}/
+                                                  );
+                                                if (!jsonMatch)
+                                                  return part.text;
+                                                const parsed = JSON.parse(
+                                                  jsonMatch[0]
+                                                );
+                                                return JSON.stringify(
+                                                  parsed,
+                                                  null,
+                                                  2
+                                                );
+                                              } catch {
+                                                return part.text;
+                                              }
+                                            })()}
+                                          </code>
+                                        </pre>
+                                      ) : (
+                                        <div className="whitespace-pre-wrap">
+                                          {part.text}
+                                        </div>
+                                      )}
+                                      {message.role === "assistant" &&
+                                        part.text.match(/\{[\s\S]*\}/) &&
+                                        !/\.\.\.\s*$/.test(part.text) && (
                                           <Actions className="flex gap-2 pt-2 border-t border-foreground/30">
                                             <Action
                                               label="Copy Workflow"
@@ -191,7 +315,34 @@ export default function Home() {
                                             </Action>
                                             <Action
                                               label="Run Workflow in N8N"
-                                              onClick={() => {}}
+                                              onClick={() => {
+                                                const jsonMatch =
+                                                  part.text.match(
+                                                    /\{[\s\S]*\}/
+                                                  );
+                                                if (jsonMatch) {
+                                                  try {
+                                                    const workflowJson =
+                                                      JSON.parse(jsonMatch[0]);
+                                                    setWorkflowToRun(
+                                                      workflowJson
+                                                    );
+                                                    setShowN8NDialog(true);
+                                                  } catch (error) {
+                                                    toast.error(
+                                                      "Failed to parse workflow JSON."
+                                                    );
+                                                    console.error(
+                                                      "JSON parsing error:",
+                                                      error
+                                                    );
+                                                  }
+                                                } else {
+                                                  toast.error(
+                                                    "No valid workflow JSON found in the message."
+                                                  );
+                                                }
+                                              }}
                                             >
                                               <Tooltip>
                                                 <TooltipTrigger asChild>
@@ -221,6 +372,18 @@ export default function Home() {
                         </MessageContent>
                       </Message>
                     ))}
+
+                    {/* When user is waiting for the LLM's answer... */}
+                    {isLoading && (
+                      <div className="flex items-center justify-center">
+                        <div className="flex items-center gap-2 text-foreground">
+                          <Loader />
+                          <span className="italic">
+                            Generating your workflow, please wait...
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </ConversationContent>
@@ -234,11 +397,11 @@ export default function Home() {
               onSubmit={handleSubmit}
               className="max-w-3xl mx-auto flex gap-4 items-center"
             >
-              <Input
-                type="text"
+              <Textarea
                 value={input}
                 onChange={(e) => setInput(e.currentTarget.value)}
                 placeholder="Describe the automation you want to achieve..."
+                className="min-h-[50px] max-h-[150px] resize-none"
               />
               <Button
                 variant="special"
