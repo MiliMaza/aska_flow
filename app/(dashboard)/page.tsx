@@ -40,20 +40,17 @@ interface ChatMessage {
 
 const exampleAutomations = [
   {
-    title: "Save Gmail attachments to Google Drive",
-    workflow: "Save Gmail attachments...",
+    title: "Guardar archivos adjuntos de Gmail en Google Drive",
   },
   {
-    title: "Sync Airtable records with Google Sheets",
-    workflow: "Sync Airtable records...",
+    title: "Copiar archivos subidos a Dropbox a una carpeta de Google Drive",
   },
   {
-    title: "Send Slack notifications for new Trello cards",
-    workflow: "Send Slack notifications...",
+    title:
+      "Enviar mensaje de Slack cuando se sube un nuevo archivo a Google Drive",
   },
   {
-    title: "Analyze Gmail URLs to detect malicious links",
-    workflow: "Analyze Gmail URLs...",
+    title: "Analizar URLs adjuntas de Gmail para detectar enlaces maliciosos",
   },
 ];
 
@@ -69,7 +66,7 @@ export default function Home() {
   // Handle N8N connection
   const handleN8NConnection = async (instanceUrl: string, apiKey: string) => {
     if (!workflowToRun) {
-      toast.error("No workflow selected to run.");
+      toast.error("Ningún workflow seleccionado para ejecutar.");
       return;
     }
 
@@ -89,16 +86,16 @@ export default function Home() {
       const result = await response.json();
 
       if (!response.ok) {
-        toast.error(result.error || "Failed to connect to n8n.");
+        toast.error(result.error || "Fallo al conectarse a n8n.");
         return;
       }
 
-      toast.success(result.message || "Workflow created successfully!");
+      toast.success(result.message || "Workflow creado exitosamente!");
       setShowN8NDialog(false);
-      setWorkflowToRun(null); // Reset after successful run
+      setWorkflowToRun(null);
     } catch (error) {
       console.error("Failed to run workflow:", error);
-      toast.error("An unexpected error occurred while connecting to n8n.");
+      toast.error("Un error inesperado ha ocurrido al conectarse a n8n.");
     }
   };
 
@@ -129,8 +126,7 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        toast.error(errorData.error || "An unknown error occurred.");
-        // Revert messages state if API call fails
+        toast.error(errorData.error || "Ha ocurrido un error desconocido.");
         setMessages(messages);
         setIsLoading(false);
         return;
@@ -147,7 +143,7 @@ export default function Home() {
       setMessages((prevMessages) => [...prevMessages, assistantMessage]);
     } catch (error) {
       console.error("Failed to fetch:", error);
-      toast.error("Failed to connect to the server.");
+      toast.error("Fallo al conectarse al servidor.");
       setMessages(messages);
     } finally {
       setIsLoading(false);
@@ -182,15 +178,15 @@ export default function Home() {
 
                     {/* Welcome Message */}
                     <div className="space-y-4">
-                      <h1 className="text-4xl font-bold">Welcome!</h1>
+                      <h1 className="text-4xl font-bold">Bienvenido!</h1>
                       <h2 className="text-3xl">
-                        I&apos;m Aska, your{" "}
-                        <span className="font-bold">flow</span> assistant 👋🏼
+                        Soy Aska, tu asistente con 
+                        <span className="font-bold"> flow</span> 👋🏼
                       </h2>
                       <p className="text-2xl">
-                        Just describe the task you want to automate <br />
-                        and I&apos;ll generate a ready-to-use N8N workflow for
-                        you.
+                        Solo tienes que describir la tarea que deseas
+                        automatizar y <br />
+                        yo te generaré un flujo de trabajo N8N listo para usar.
                       </p>
                     </div>
 
@@ -198,7 +194,7 @@ export default function Home() {
                     <div className="max-w-3xl mx-auto mt-12 text-center space-y-8">
                       <div className="space-y-4">
                         <p className="text-lg italic">
-                          Here are some examples of what you can ask:
+                          Aquí tienes algunos ejemplos para empezar:
                         </p>
                         <div className="w-full max-w-4xl mx-auto">
                           <Suggestions className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
@@ -280,9 +276,9 @@ export default function Home() {
                                         !/\.\.\.\s*$/.test(part.text) && (
                                           <Actions className="flex gap-2 pt-2 border-t border-foreground/30">
                                             <Action
-                                              label="Copy Workflow"
+                                              label="Copiar Workflow"
                                               onClick={() => {
-                                                // Find JSON in the message text
+                                                // Find JSON in the message
                                                 const jsonMatch =
                                                   part.text.match(
                                                     /\{[\s\S]*\}/
@@ -293,12 +289,12 @@ export default function Home() {
                                                     .writeText(jsonMatch[0])
                                                     .then(() => {
                                                       toast.success(
-                                                        "Workflow copied to clipboard!"
+                                                        "Workflow copiado!"
                                                       );
                                                     })
                                                     .catch(() => {
                                                       toast.error(
-                                                        "Failed to copy workflow"
+                                                        "Fallo al copiar workflow"
                                                       );
                                                     });
                                                 }
@@ -309,12 +305,12 @@ export default function Home() {
                                                   <Copy className="size-4" />
                                                 </TooltipTrigger>
                                                 <TooltipContent>
-                                                  <p>Copy Workflow</p>
+                                                  <p>Copiar Workflow</p>
                                                 </TooltipContent>
                                               </Tooltip>
                                             </Action>
                                             <Action
-                                              label="Run Workflow in N8N"
+                                              label="Ejecutar Workflow en N8N"
                                               onClick={() => {
                                                 const jsonMatch =
                                                   part.text.match(
@@ -330,7 +326,7 @@ export default function Home() {
                                                     setShowN8NDialog(true);
                                                   } catch (error) {
                                                     toast.error(
-                                                      "Failed to parse workflow JSON."
+                                                      "Fallo al obtener el JSON del workflow."
                                                     );
                                                     console.error(
                                                       "JSON parsing error:",
@@ -339,7 +335,7 @@ export default function Home() {
                                                   }
                                                 } else {
                                                   toast.error(
-                                                    "No valid workflow JSON found in the message."
+                                                    "No se ha encontrado un JSON válido en el mensaje."
                                                   );
                                                 }
                                               }}
@@ -349,7 +345,9 @@ export default function Home() {
                                                   <ExternalLink className="size-4" />
                                                 </TooltipTrigger>
                                                 <TooltipContent>
-                                                  <p>Run Workflow in N8N</p>
+                                                  <p>
+                                                    Ejecutar Workflow en N8N
+                                                  </p>
                                                 </TooltipContent>
                                               </Tooltip>
                                             </Action>
@@ -379,7 +377,7 @@ export default function Home() {
                         <div className="flex items-center gap-2 text-foreground">
                           <Loader />
                           <span className="italic">
-                            Generating your workflow, please wait...
+                            Generando su workflow, por favor espere...
                           </span>
                         </div>
                       </div>
@@ -400,7 +398,7 @@ export default function Home() {
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.currentTarget.value)}
-                placeholder="Describe the automation you want to achieve..."
+                placeholder="Describe la automatización que quieres conseguir..."
                 className="min-h-[50px] max-h-[150px] resize-none"
               />
               <Button
