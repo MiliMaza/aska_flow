@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "@/app/globals.css";
 import { Toaster } from "@/app/components/ui/sonner";
 import { ClerkProvider } from "@clerk/nextjs";
+import { esES } from "@clerk/localizations";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,7 +13,7 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "Aska Flow",
   description:
-    "Platform that allows creation and execution of automation workflows through AI, integrated with n8n.",
+    "Plataforma que permite la creación y ejecución de flujos de automatización mediante IA, integrada con n8n.",
 };
 
 export default function RootLayout({
@@ -21,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={esES}>
       <html lang="en">
         <body className={`${geistSans.variable} antialiased`}>
           {children}

@@ -38,35 +38,34 @@ export default function AuthPage() {
           <div className="max-w-3xl mx-auto">
             <div className="border-2 border-main rounded-lg p-4 bg-background/80 backdrop-blur-sm">
               <p className="text-lg text-foreground text-balance">
-                A <span className="font-bold">powerful tool</span> to create and
-                design custom automations. <br />
-                Easy, fast, and accessible{" "}
-                <span className="font-bold">for everyone</span> — no experience
-                needed. <br />
-                Just describe what you want to automate, and our AI{" "}
-                <span className="font-bold">builds it for you</span>.
+                Una <span className="font-bold">potente herramienta</span> para
+                crear y diseñar automatizaciones. <br />
+                Fácil, rápida y accesible para todos, sin necesidad de
+                experiencia previa. <br />
+                Solo debes describir lo que quieres{" "}
+                <span className="font-bold"> automatizar</span>, y nuestra IA
+                lo hará por ti.
               </p>
             </div>
           </div>
 
           {/* Arrow */}
           <div className="flex flex-col items-center space-y-2 mt-10">
-            <p className="text-xl font-semibold text-foreground">Start today</p>
+            <p className="text-xl font-semibold text-foreground">Comienza hoy</p>
             <MoveDown className="w-6 h-6" color="#01161eff" />
           </div>
 
           {/* Auth buttons */}
-          {/* TODO: On click open Clerk Modals */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-12">
             <SignInButton mode="modal">
               <Button variant="default" size="lg" className="px-10 text-lg">
-                Log In
+                Iniciar Sesión
               </Button>
             </SignInButton>
 
             <SignUpButton mode="modal">
               <Button variant="default" size="lg" className="px-10 text-lg">
-                Register
+                Registrarse
               </Button>
             </SignUpButton>
           </div>

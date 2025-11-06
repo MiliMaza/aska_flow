@@ -7,20 +7,16 @@ import { Separator } from "@/app/components/ui/separator";
 
 const workflowExamples = [
   {
-    title: "Save Gmail attachments",
-    description: "Save Gmail attachments to Google Drive",
+    title: "Guardar archivos adjuntos",
   },
   {
-    title: "Sync Airtable records",
-    description: "Sync Airtable records with Google Sheets",
+    title: "Copiar archivos subidos",
   },
   {
-    title: "Send Slack notifications",
-    description: "Send Slack notifications for new Trello cards",
+    title: "Enviar mensaje de Slack",
   },
   {
-    title: "Analyze Gmail URLs",
-    description: "Analyze Gmail URLs to detect malicious links",
+    title: "Analizar URLS de Gmail",
   },
 ];
 
@@ -33,19 +29,17 @@ export default function Sidebar() {
         isOpen ? "translate-x-0" : "-translate-x-full"
       } fixed lg:fixed flex flex-col w-72 bg-secondary text-background p-6 h-screen transition-transform duration-300 ease-in-out z-50`}
     >
-      {/* TODO: Add a collapisble aside */}
-      {/* "Chat History + icon to collapse/open it" */}
       <div className="flex items-center justify-center mt-1 mb-8">
-        <h2 className="text-xl font-semibold">Chat History</h2>
+        <h2 className="text-xl font-semibold">Historial de Chats</h2>
       </div>
 
       <Separator className="mb-6" />
 
       {/* New Workflow */}
-      {/* TODO: Open new chat interface */}
+      {/* TODO: Open new and empty chat interface */}
       <Button variant="default" size="lg">
         <Plus className="w-5 h-5" />
-        New Workflow
+        Nuevo Chat
       </Button>
 
       <Separator className="my-6" />
@@ -77,7 +71,7 @@ export default function Sidebar() {
         onClick={() => window.open("https://docs.n8n.io/", "_blank")}
       >
         <BookOpenText className="w-5 h-5" />
-        Check N8N Docs
+        Leer Docs de N8N
       </Button>
     </aside>
   );
