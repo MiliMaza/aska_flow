@@ -7,20 +7,18 @@ import { Button } from "@/app/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
-  const { toggle, isOpen } = useSidebar();
+  const { toggle } = useSidebar();
 
   return (
-    <nav
-      className={`bg-secondary w-full transition-all duration-300 ${
-        isOpen ? "lg:pl-72" : "lg:pl-0"
-      }`}
-    >
+    <nav className="bg-secondary w-full">
       <div className="flex items-center justify-between p-5">
+        
         {/* Logo and Name */}
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={toggle}>
             <Menu className="w-6 h-6" />
           </Button>
+
           <div
             className="flex items-center gap-4 cursor-pointer"
             onClick={() => window.location.reload()}
