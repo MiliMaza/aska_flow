@@ -38,7 +38,10 @@ export const Suggestion = ({
 
   return (
     <Button
-      className={cn("cursor-pointer rounded-lg px-4", className)}
+      className={cn(
+        "h-auto cursor-pointer whitespace-normal rounded-lg p-2",
+        className
+      )}
       onClick={handleClick}
       size={size}
       type="button"

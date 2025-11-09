@@ -36,17 +36,17 @@ export function N8NConnectionDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent aria-describedby="">
         <DialogHeader>
-          <DialogTitle>Connect to N8N</DialogTitle>
+          <DialogTitle>Conectarse a N8N</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="instanceUrl" className="text-sm font-medium">
-              N8N Instance URL
+              URL de instancia N8N
             </label>
             <Input
               id="instanceUrl"
               type="url"
-              placeholder="https://your-n8n-instance.com"
+              placeholder="https://tu-instancia-n8n.com"
               className="bg-background mt-2"
               value={instanceUrl}
               onChange={(e) => setInstanceUrl(e.target.value)}
@@ -55,12 +55,12 @@ export function N8NConnectionDialog({
           </div>
           <div className="space-y-2">
             <label htmlFor="apiKey" className="text-sm font-medium">
-              N8N API Key
+              API Key de N8N
             </label>
             <Input
               id="apiKey"
               type="password"
-              placeholder="Your N8N API Key"
+              placeholder="Tu API Key de N8N"
               className="bg-background mt-2"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
@@ -69,10 +69,10 @@ export function N8NConnectionDialog({
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" variant="special">
-              Connect
+              Conectar
             </Button>
           </DialogFooter>
         </form>
