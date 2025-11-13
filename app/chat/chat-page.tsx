@@ -136,7 +136,9 @@ function PageContent({ initialConversationId }: PageContentProps) {
     string | null
   >(initialConversationId);
   const [isFetchingConversations, setIsFetchingConversations] = useState(false);
-  const [isHydratingConversation, setIsHydratingConversation] = useState(false);
+  const [isHydratingConversation, setIsHydratingConversation] = useState(
+    () => Boolean(initialConversationId)
+  );
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
   const [showExamples] = useState(true);
   const [showN8NDialog, setShowN8NDialog] = useState(false);
