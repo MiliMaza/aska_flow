@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import { Toaster } from "@/app/components/ui/sonner";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
+import { SidebarProvider } from "@/app/components/layout/side-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +26,7 @@ export default function RootLayout({
     <ClerkProvider localization={esES}>
       <html lang="en">
         <body className={`${geistSans.variable} antialiased`}>
-          {children}
+          <SidebarProvider>{children}</SidebarProvider>
           <Toaster />
         </body>
       </html>
