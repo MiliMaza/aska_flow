@@ -3,6 +3,14 @@ import { generateText, UIMessage, convertToModelMessages } from "ai";
 import { n8nWorkflowSchema } from "@/lib/workflow-schema";
 import { securityScan } from "@/lib/security-scanner";
 import { NextResponse } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import {
+  createConversation,
+  getConversationById,
+} from "@/lib/repos/conversations";
+import { appendMessage } from "@/lib/repos/messages";
+import { upsertUser } from "@/lib/repos/users";
+import { createWorkflow } from "@/lib/repos/workflows";
 
 const openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY || "",
@@ -13,7 +21,22 @@ const MAX_INPUT_LENGTH = 2000;
 
 export async function POST(req: Request) {
   try {
-    const { messages }: { messages: UIMessage[] } = await req.json();
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const {
+      messages,
+      conversationId,
+    }: { messages: UIMessage[]; conversationId?: string } = await req.json();
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json(
+        { error: "The storic messages are required." },
+        { status: 400 }
+      );
+    }
 
     const latestUserInput = messages[messages.length - 1]?.parts.find(
       (part) => part.type === "text"
@@ -25,6 +48,40 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
+
+    const profile = await currentUser();
+    await upsertUser({
+      id: userId,
+      email: profile?.primaryEmailAddress?.emailAddress,
+      firstName: profile?.firstName,
+      lastName: profile?.lastName,
+      imageUrl: profile?.imageUrl,
+    });
+
+    let conversation: Awaited<ReturnType<typeof createConversation>> | null =
+      null;
+    if (conversationId && conversationId.length > 0) {
+      conversation = await getConversationById(conversationId, userId);
+
+      if (!conversation) {
+        return NextResponse.json(
+          { error: "Conversation not found" },
+          { status: 404 }
+        );
+      }
+    }
+
+    if (!conversation) {
+      const title = latestUserInput.trim().slice(0, 80) || "Nueva conversación";
+      conversation = await createConversation({ userId, title });
+    }
+
+    await appendMessage({
+      conversationId: conversation.id,
+      role: "user",
+      content: latestUserInput,
+      metadata: { uiMessages: messages },
+    });
 
     const { text } = await generateText({
       model: openrouter.chat("openai/gpt-oss-20b"),
@@ -133,17 +190,27 @@ export async function POST(req: Request) {
 
     // Validate against n8n workflow schema
     const validationResult = n8nWorkflowSchema.safeParse(workflowJson);
+
     if (!validationResult.success) {
-      // If the response is an error message (LLM detected non-workflow request)
       if (workflowJson.error) {
-        return NextResponse.json({ content: jsonMatch[0] });
+        const assistantMessage = await appendMessage({
+          conversationId: conversation.id,
+          role: "assistant",
+          content: jsonMatch[0],
+        });
+
+        return NextResponse.json({
+          content: jsonMatch[0],
+          conversation,
+          assistantMessage,
+        });
       }
 
-      // If the response is a failed workflow generation
       console.error(
         "Schema validation failed:",
         validationResult.error.flatten()
       );
+
       return NextResponse.json(
         {
           error:
@@ -155,6 +222,7 @@ export async function POST(req: Request) {
 
     // Validate against security rules
     const validationSecurity = securityScan(validationResult.data);
+    
     if (!validationSecurity.isSafe) {
       console.error("Security scan failed:", validationSecurity.reason);
       return NextResponse.json(
@@ -165,14 +233,34 @@ export async function POST(req: Request) {
       );
     }
 
+    const workflowRecord = await createWorkflow({
+      conversationId: conversation.id,
+      status: "completed",
+      result: validationResult.data,
+    });
+
+    const assistantMessage = await appendMessage({
+      conversationId: conversation.id,
+      role: "assistant",
+      content: text,
+      metadata: { workflowId: workflowRecord.id },
+    });
+
     // After all validations, return full response
-    return NextResponse.json({ content: text });
+    return NextResponse.json({
+      content: text,
+      conversation,
+      assistantMessage,
+      workflow: workflowRecord,
+    });
   } catch (error) {
     console.error("Error in POST /api/chat:", error);
     let errorMessage = "An unexpected error occurred.";
+
     if (error instanceof Error) {
       errorMessage = error.message;
     }
+
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
