@@ -69,7 +69,7 @@ export default function Sidebar({
 
         <div className="space-y-4">
           <h3 className="text-sm font-medium px-2">CHATS</h3>
-          {isLoadingConversations ? (
+          {isLoadingConversations && conversations.length === 0 ? (
             <p className="text-sm text-background/70 px-2">Cargando...</p>
           ) : conversations.length === 0 ? (
             <p className="text-sm text-background/70 px-2">

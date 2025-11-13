@@ -114,6 +114,12 @@ const exampleAutomations = [
   },
 ];
 
+let conversationsCache: ConversationSummary[] | null = null;
+
+type FetchConversationsOptions = {
+  showLoading?: boolean;
+};
+
 type PageContentProps = {
   initialConversationId: string | null;
 };
@@ -123,7 +129,9 @@ function PageContent({ initialConversationId }: PageContentProps) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  const [conversations, setConversations] = useState<ConversationSummary[]>(
+    () => conversationsCache ?? []
+  );
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
   >(initialConversationId);
@@ -144,6 +152,10 @@ function PageContent({ initialConversationId }: PageContentProps) {
   const workflowRefs = useRef(new Map<string, HTMLDivElement>());
   const { user } = useUser();
   const { isOpen } = useSidebar();
+
+  useEffect(() => {
+    conversationsCache = conversations;
+  }, [conversations]);
   const navigateToConversation = useCallback(
     (conversationId: string | null) => {
       const target = conversationId ? `/chat/${conversationId}` : "/";
@@ -152,32 +164,40 @@ function PageContent({ initialConversationId }: PageContentProps) {
     [router]
   );
 
-  const fetchConversations = useCallback(async () => {
-    setIsFetchingConversations(true);
-    try {
-      const response = await fetch("/api/conversations", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("The conversations did not load.");
+  const fetchConversations = useCallback(
+    async (options?: FetchConversationsOptions) => {
+      const shouldShowLoading = options?.showLoading ?? false;
+      if (shouldShowLoading) {
+        setIsFetchingConversations(true);
       }
+      try {
+        const response = await fetch("/api/conversations", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      const data = await response.json();
-      setConversations(data.conversations ?? []);
-    } catch (error) {
-      console.error("Failed to fetch conversations", error);
-      toast.error("No se pudieron cargar tus conversaciones.");
-    } finally {
-      setIsFetchingConversations(false);
-    }
-  }, []);
+        if (!response.ok) {
+          throw new Error("The conversations did not load.");
+        }
+
+        const data = await response.json();
+        setConversations(data.conversations ?? []);
+      } catch (error) {
+        console.error("Failed to fetch conversations", error);
+        toast.error("No se pudieron cargar tus conversaciones.");
+      } finally {
+        if (shouldShowLoading) {
+          setIsFetchingConversations(false);
+        }
+      }
+    },
+    []
+  );
 
   useEffect(() => {
-    fetchConversations();
+    fetchConversations({ showLoading: conversationsCache === null });
   }, [fetchConversations]);
 
   const hydrateConversation = useCallback(async (conversationId: string) => {
