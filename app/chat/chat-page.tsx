@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Send, Copy, ExternalLink, Workflow } from "lucide-react";
 import { toast } from "sonner";
@@ -123,6 +123,8 @@ const exampleAutomations = [
   },
 ];
 
+const LONG_RESPONSE_DELAY_MS = 8000;
+
 let conversationsCache: ConversationSummary[] | null = null;
 
 type FetchConversationsOptions = {
@@ -135,6 +137,7 @@ type PageContentProps = {
 
 function PageContent({ initialConversationId }: PageContentProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -166,6 +169,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
   const [renameInputValue, setRenameInputValue] = useState("");
   const [isRenamingConversation, setIsRenamingConversation] = useState(false);
   const [isDeletingConversation, setIsDeletingConversation] = useState(false);
+  const [isTakingLonger, setIsTakingLonger] = useState(false);
   const messageRefs = useRef(new Map<string, HTMLDivElement>());
   const workflowRefs = useRef(new Map<string, HTMLDivElement>());
   const { user } = useUser();
@@ -174,12 +178,29 @@ function PageContent({ initialConversationId }: PageContentProps) {
   useEffect(() => {
     conversationsCache = conversations;
   }, [conversations]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setIsTakingLonger(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setIsTakingLonger(true);
+    }, LONG_RESPONSE_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [isLoading]);
+
   const navigateToConversation = useCallback(
     (conversationId: string | null) => {
       const target = conversationId ? `/chat/${conversationId}` : "/";
+      if (target === pathname) {
+        return;
+      }
       router.push(target);
     },
-    [router]
+    [pathname, router]
   );
 
   const fetchConversations = useCallback(
@@ -1048,7 +1069,9 @@ function PageContent({ initialConversationId }: PageContentProps) {
                       <div className="flex items-center gap-2 text-foreground">
                         <Loader />
                         <span className="italic">
-                          Generando su workflow, por favor espere...
+                          {isTakingLonger
+                            ? "Esto puede tomar algunos segundos más..."
+                            : "Generando su workflow, por favor espere..."}
                         </span>
                       </div>
                     </div>
@@ -1129,7 +1152,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
                           </Button>
                           {messageId && (
                             <Button
-                              variant="ghost"
+                              variant="secondary"
                               size="sm"
                               onClick={() => scrollToMessage(messageId)}
                               className="flex items-center gap-2"
