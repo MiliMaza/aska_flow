@@ -21,7 +21,7 @@ export default function Navbar() {
 
           <div
             className="flex items-center gap-4 cursor-pointer"
-            onClick={() => window.location.reload()}
+            onClick={() => window.location.replace("/")}
           >
             <Image
               src="/Logo.png"

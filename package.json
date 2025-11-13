@@ -6,13 +6,15 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate": "node scripts/migrate.js"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.8",
     "@ai-sdk/react": "^2.0.9",
     "@clerk/localizations": "^3.27.0",
     "@clerk/nextjs": "^6.32.2",
+    "@libsql/client": "^0.15.15",
     "@openrouter/ai-sdk-provider": "^1.2.0",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-collapsible": "^1.1.12",
