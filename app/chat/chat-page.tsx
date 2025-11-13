@@ -10,6 +10,7 @@ import Navbar from "@/app/components/layout/navbar";
 import Aside from "@/app/components/layout/sidebar";
 import { useSidebar } from "@/app/components/layout/side-context";
 import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
 import { Textarea } from "@/app/components/ui/textarea";
 import { Suggestion, Suggestions } from "@/app/components/ui/suggestion";
 import { Actions, Action } from "@/app/components/ui/actions";
@@ -24,6 +25,14 @@ import {
   ConversationEmptyState,
   ConversationScrollButton,
 } from "@/app/components/ui/conversation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/app/components/ui/dialog";
 import {
   Message,
   MessageContent,
@@ -136,8 +145,8 @@ function PageContent({ initialConversationId }: PageContentProps) {
     string | null
   >(initialConversationId);
   const [isFetchingConversations, setIsFetchingConversations] = useState(false);
-  const [isHydratingConversation, setIsHydratingConversation] = useState(
-    () => Boolean(initialConversationId)
+  const [isHydratingConversation, setIsHydratingConversation] = useState(() =>
+    Boolean(initialConversationId)
   );
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
   const [showExamples] = useState(true);
@@ -150,6 +159,13 @@ function PageContent({ initialConversationId }: PageContentProps) {
   const [highlightedWorkflowId, setHighlightedWorkflowId] = useState<
     string | null
   >(null);
+  const [conversationPendingRename, setConversationPendingRename] =
+    useState<Pick<ConversationSummary, "id" | "title"> | null>(null);
+  const [conversationPendingDelete, setConversationPendingDelete] =
+    useState<Pick<ConversationSummary, "id" | "title"> | null>(null);
+  const [renameInputValue, setRenameInputValue] = useState("");
+  const [isRenamingConversation, setIsRenamingConversation] = useState(false);
+  const [isDeletingConversation, setIsDeletingConversation] = useState(false);
   const messageRefs = useRef(new Map<string, HTMLDivElement>());
   const workflowRefs = useRef(new Map<string, HTMLDivElement>());
   const { user } = useUser();
@@ -251,6 +267,15 @@ function PageContent({ initialConversationId }: PageContentProps) {
     }
   }, [initialConversationId, hydrateConversation]);
 
+  const closeRenameDialog = useCallback(() => {
+    setConversationPendingRename(null);
+    setRenameInputValue("");
+  }, []);
+
+  const closeDeleteDialog = useCallback(() => {
+    setConversationPendingDelete(null);
+  }, []);
+
   const handleSelectConversation = useCallback(
     (conversationId: string) => {
       if (!conversationId || conversationId === activeConversationId) {
@@ -284,82 +309,110 @@ function PageContent({ initialConversationId }: PageContentProps) {
   }, [navigateToConversation]);
 
   const handleRenameConversation = useCallback(
-    async (conversationId: string) => {
+    (conversationId: string) => {
       const target = conversations.find((item) => item.id === conversationId);
-      const currentTitle = target?.title ?? "";
-      // TODO: Replace with a modal dialog
-      const nextTitle = window.prompt(
-        "Nuevo nombre para la conversación: ",
-        currentTitle
-      );
-      if (nextTitle === null) return;
-      const trimmed = nextTitle.trim();
+      setConversationPendingRename({
+        id: conversationId,
+        title: target?.title ?? null,
+      });
+      setRenameInputValue(target?.title ?? "");
+    },
+    [conversations]
+  );
 
-      try {
-        const response = await fetch(`/api/conversations/${conversationId}`, {
+  const handleConfirmRenameConversation = useCallback(async () => {
+    if (!conversationPendingRename) return;
+    setIsRenamingConversation(true);
+    const trimmed = renameInputValue.trim();
+
+    try {
+      const response = await fetch(
+        `/api/conversations/${conversationPendingRename.id}`,
+        {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ title: trimmed || null }),
-        });
-
-        if (!response.ok) {
-          throw new Error("The conversation could not be rename.");
         }
+      );
 
-        const data = await response.json();
-        upsertConversationInState(data.conversation);
-        toast.success("Conversación renombrada.");
-      } catch (error) {
-        console.error("Failed to rename conversation:", error);
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "No se pudo renombrar la conversación."
-        );
+      if (!response.ok) {
+        throw new Error("The conversation could not be rename.");
       }
-    },
-    [conversations, upsertConversationInState]
-  );
+
+      const data = await response.json();
+      upsertConversationInState(data.conversation);
+      toast.success("Conversación renombrada.");
+      closeRenameDialog();
+    } catch (error) {
+      console.error("Failed to rename conversation:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "No se pudo renombrar la conversación."
+      );
+    } finally {
+      setIsRenamingConversation(false);
+    }
+  }, [
+    closeRenameDialog,
+    conversationPendingRename,
+    renameInputValue,
+    upsertConversationInState,
+  ]);
 
   const handleDeleteConversation = useCallback(
-    async (conversationId: string) => {
-      // TODO: Replace with a modal dialog
-      const confirmed = window.confirm(
-        "¿Desea eliminar esta conversación y sus mensajes?"
-      );
-      if (!confirmed) return;
-
-      try {
-        const response = await fetch(`/api/conversations/${conversationId}`, {
-          method: "DELETE",
-        });
-
-        if (!response.ok) {
-          throw new Error("The conversation could not be delete.");
-        }
-
-        setConversations((prev) =>
-          prev.filter((item) => item.id !== conversationId)
-        );
-
-        if (activeConversationId === conversationId) {
-          handleNewConversation();
-        }
-
-        toast.success("Conversación eliminada.");
-      } catch (error) {
-        console.error("Failed to delete conversation:", error);
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "No se pudo eliminar la conversación."
-        );
-      }
+    (conversationId: string) => {
+      const target = conversations.find((item) => item.id === conversationId);
+      setConversationPendingDelete({
+        id: conversationId,
+        title: target?.title ?? null,
+      });
     },
-    [activeConversationId, handleNewConversation]
+    [conversations]
   );
+
+  const handleConfirmDeleteConversation = useCallback(async () => {
+    if (!conversationPendingDelete) return;
+    setIsDeletingConversation(true);
+    const conversationId = conversationPendingDelete.id;
+
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("The conversation could not be delete.");
+      }
+
+      setConversations((prev) =>
+        prev.filter((item) => item.id !== conversationId)
+      );
+
+      if (activeConversationId === conversationId) {
+        handleNewConversation();
+      }
+
+      toast.success("Conversación eliminada.");
+      closeDeleteDialog();
+    } catch (error) {
+      console.error("Failed to delete conversation:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar la conversación."
+      );
+    } finally {
+      setIsDeletingConversation(false);
+    }
+  }, [
+    activeConversationId,
+    closeDeleteDialog,
+    conversationPendingDelete,
+    handleNewConversation,
+  ]);
 
   const upsertWorkflow = useCallback((workflow: WorkflowSummary) => {
     setWorkflows((prev) => {
@@ -1118,6 +1171,89 @@ function PageContent({ initialConversationId }: PageContentProps) {
           </form>
         </div>
       </main>
+      <Dialog
+        open={Boolean(conversationPendingRename)}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeRenameDialog();
+          }
+        }}
+      >
+        <DialogContent>
+          <form
+            className="space-y-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleConfirmRenameConversation();
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Renombrar conversación</DialogTitle>
+              <DialogDescription>
+                Actualiza el nombre para identificar este chat
+              </DialogDescription>
+            </DialogHeader>
+            <Input
+              autoFocus
+              value={renameInputValue}
+              placeholder="Conversación sin título"
+              onChange={(event) => setRenameInputValue(event.target.value)}
+            />
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={closeRenameDialog}
+                disabled={isRenamingConversation}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isRenamingConversation}>
+                {isRenamingConversation ? "Guardando..." : "Guardar"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={Boolean(conversationPendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeDeleteDialog();
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Eliminar conversación</DialogTitle>
+            <DialogDescription>
+              Esta acción eliminará todos los mensajes vinculados a este chat
+            </DialogDescription>
+          </DialogHeader>
+          <p className="text-sm text-foreground/90">
+            ¿Desea eliminar &quot;
+            {conversationPendingDelete?.title || "Conversación sin título"}
+            &quot; y sus mensajes?
+          </p>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={closeDeleteDialog}
+              disabled={isDeletingConversation}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              onClick={handleConfirmDeleteConversation}
+              disabled={isDeletingConversation}
+            >
+              {isDeletingConversation ? "Eliminando..." : "Eliminar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
