@@ -107,6 +107,17 @@ const formatWorkflowDate = (value: string) =>
     timeStyle: "short",
   });
 
+const normalizeWorkflowError = (error: string | null | undefined) => {
+  if (!error) return null;
+  const normalized = error.trim();
+  if (!normalized) return null;
+  const normalizedLower = normalized.toLowerCase();
+  if (normalizedLower === "null" || normalizedLower === "undefined") {
+    return null;
+  }
+  return normalized;
+};
+
 const exampleAutomations = [
   {
     title: "Guardar archivos adjuntos de Gmail en Google Drive",
@@ -1093,6 +1104,9 @@ function PageContent({ initialConversationId }: PageContentProps) {
                     const workflowName = getWorkflowTitle(workflow);
                     const messageId = workflowMessageMap.get(workflow.id);
                     const isHighlighted = highlightedWorkflowId === workflow.id;
+                    const workflowError = normalizeWorkflowError(
+                      workflow.error
+                    );
                     return (
                       <div
                         key={workflow.id}
@@ -1121,9 +1135,9 @@ function PageContent({ initialConversationId }: PageContentProps) {
                             {workflow.status}
                           </span>
                         </div>
-                        {workflow.error ? (
+                        {workflowError ? (
                           <p className="text-sm text-main">
-                            Error: {workflow.error}
+                            Error: {workflowError}
                           </p>
                         ) : (
                           <p className="text-sm text-foreground/70">

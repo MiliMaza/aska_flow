@@ -122,6 +122,7 @@ export async function POST(req: Request) {
            "timezone": "string (UTC)",
            "saveDataErrorExecution": "string (all)"
          },
+         // IMPORTANT: never include the top-level field "active"; n8n manages activation status.
        }
 
     2. NODES MUST:
@@ -221,8 +222,11 @@ export async function POST(req: Request) {
     }
 
     // Validate against security rules
-    const validationSecurity = securityScan(validationResult.data);
-    
+    const sanitizedWorkflow = { ...validationResult.data };
+    delete (sanitizedWorkflow as { active?: unknown }).active;
+
+    const validationSecurity = securityScan(sanitizedWorkflow);
+
     if (!validationSecurity.isSafe) {
       console.error("Security scan failed:", validationSecurity.reason);
       return NextResponse.json(
@@ -236,7 +240,7 @@ export async function POST(req: Request) {
     const workflowRecord = await createWorkflow({
       conversationId: conversation.id,
       status: "completed",
-      result: validationResult.data,
+      result: sanitizedWorkflow,
     });
 
     const assistantMessage = await appendMessage({
