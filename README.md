@@ -56,4 +56,4 @@ Aska Flow es un generador de automatizaciones con IA integrada, centrado en la c
 4. Revisa, renombra o elimina conversaciones pasadas desde el panel lateral.
 
 ## Autora
-   Milagros Maza [text](https://github.com/MiliMaza)
+[Milagros Maza](https://github.com/MiliMaza)
