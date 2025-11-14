@@ -3,10 +3,10 @@ import { randomUUID } from "node:crypto";
 import { db } from "@/lib/db";
 
 export type WorkflowStatus =
-  | "pendiente"
-  | "en ejecución"
-  | "fallido"
-  | "completado";
+  | "pending"
+  | "running"
+  | "failed"
+  | "completed";
 
 export type WorkflowRecord = {
   id: string;
@@ -67,7 +67,7 @@ export async function createWorkflow(input: {
     args: [
       id,
       input.conversationId,
-      input.status ?? "pendiente",
+      input.status ?? "pending",
       serializeJson(input.result),
       input.error ?? null,
     ],
