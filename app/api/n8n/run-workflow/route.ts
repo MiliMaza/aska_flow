@@ -17,13 +17,14 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            "Missing required parameters: instanceUrl, apiKey, or workflowJson.",
+            "Faltan parámetros requeridos: instanceUrl, apiKey, or workflowJson.",
         },
         { status: 400 }
       );
     }
 
     // Build the full API URL for creating a workflow
+    // TODO: Implement the possibility to connect to n8n cloud instances
     const apiUrl = `${instanceUrl.replace(/\/$/, "")}/api/v1/workflows`;
 
     // Make the POST request to the user's n8n instance
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
       console.error("n8n API Error:", errorBody);
       return NextResponse.json(
         {
-          error: `Failed to create workflow in n8n. Status: ${
+          error: `Fallo al crear el workflow en n8n. Estado: ${
             response.status
           }. Message: ${errorBody.message || "Unknown error"}`,
         },
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
 
     // Return a success response
     return NextResponse.json({
-      message: "Workflow created successfully in your n8n instance!",
+      message: "Workflow creado exitosamente en n8n!",
       workflowId: responseData.id, // Send back the new workflow ID
     });
   } catch (error) {

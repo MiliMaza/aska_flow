@@ -53,7 +53,7 @@ export async function GET(
 
     console.error("Failed to fetch workflows", error);
     return NextResponse.json(
-      { error: "Failed to fetch workflows" },
+      { error: "Fallo al leer los workflows" },
       { status: 500 }
     );
   }
@@ -71,7 +71,7 @@ export async function POST(
 
     if (!conversation) {
       return NextResponse.json(
-        { error: "Conversation not found" },
+        { error: "Conversación no encontrada" },
         { status: 404 }
       );
     }
@@ -101,7 +101,7 @@ export async function POST(
 
     console.error("Failed to create workflow", error);
     return NextResponse.json(
-      { error: "Failed to create workflow" },
+      { error: "Fallo al crear el workflow" },
       { status: 500 }
     );
   }
