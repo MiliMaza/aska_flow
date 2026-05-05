@@ -1,0 +1,45 @@
+"use client";
+
+import Image from "next/image";
+import { Menu } from "lucide-react";
+import { useSidebar } from "@/app/components/layout/side-context";
+import { Button } from "@/app/components/ui/button";
+import { UserButton } from "@clerk/nextjs";
+
+export default function Navbar() {
+  const { toggle } = useSidebar();
+
+  return (
+    <nav className="bg-secondary w-full">
+      <div className="flex items-center justify-between p-5">
+        
+        {/* Logo and Name */}
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={toggle}>
+            <Menu className="w-6 h-6" />
+          </Button>
+
+          <div
+            className="flex items-center gap-4 cursor-pointer"
+            onClick={() => window.location.replace("/")}
+          >
+            <Image
+              src="/Logo.png"
+              alt="Aska Flow Logo"
+              width={32}
+              height={32}
+            />
+            <span className="text-2xl font-bold text-background">
+              ASKA <span className="font-semibold">FLOW</span>
+            </span>
+          </div>
+        </div>
+
+        {/* User profile */}
+        <div className="flex items-center gap-4">
+          <UserButton />
+        </div>
+      </div>
+    </nav>
+  );
+}

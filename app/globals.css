@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+:root {
+  /* Colors */
+  --background: #f7f7ff;
+  --foreground: #01161e;
+  /* Main color (buttons, links, ctas) */
+  --engineering-orange: #c03221ff;
+  /* Secondary color (cards, sections, active elements) */
+  --midnight-green: #124559ff;
+  /* Accent color (hover states) */
+  --air-force-blue: #598392ff;
+
+  /* Radius */
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+
+  /* Colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-main: var(--engineering-orange);
+  --color-secondary: var(--midnight-green);
+  --color-accent: var(--air-force-blue);
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+body {
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-main outline-main/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
