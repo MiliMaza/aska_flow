@@ -24,8 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider localization={esES}>
-      <html lang="en">
-        <body className={`${geistSans.variable} antialiased`}>
+      <html lang="es">
+        <body
+          className={`${geistSans.variable} antialiased`}
+          suppressHydrationWarning
+        >
           <SidebarProvider>{children}</SidebarProvider>
           <Toaster />
         </body>
