@@ -12,7 +12,6 @@ export default function Navbar() {
   return (
     <nav className="bg-secondary w-full">
       <div className="flex items-center justify-between p-5">
-        
         {/* Logo and Name */}
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={toggle}>

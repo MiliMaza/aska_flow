@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={esES}>
+    <ClerkProvider localization={esES} afterSignOutUrl={"/auth"}>
       <html lang="es">
         <body
           className={`${geistSans.variable} antialiased`}

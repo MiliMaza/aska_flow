@@ -1,6 +1,6 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
-export default clerkMiddleware(async (auth, req) => {
+export const proxy = clerkMiddleware(async (auth, req) => {
   const path = req.nextUrl.pathname;
   // Allow access to auth pages without authentication
   if (path.startsWith("/auth")) {
