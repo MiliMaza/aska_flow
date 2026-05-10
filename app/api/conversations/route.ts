@@ -12,7 +12,7 @@ class UnauthorizedError extends Error {}
 async function requireUserId() {
   const { userId } = await auth();
   if (!userId) {
-    throw new UnauthorizedError("Unauthorized");
+    throw new UnauthorizedError("No autorizado");
   }
   return userId;
 }
@@ -28,10 +28,10 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
-    console.error("Failed to list conversations", error);
+    console.error("Fallo al cargar las conversaciones", error);
     return NextResponse.json(
-      { error: "Failed to list conversations" },
-      { status: 500 }
+      { error: "Fallo al cargar las conversaciones" },
+      { status: 500 },
     );
   }
 }
@@ -62,10 +62,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
-    console.error("Failed to create conversation", error);
+    console.error("Fallo al crear la conversación", error);
     return NextResponse.json(
-      { error: "Failed to create conversation" },
-      { status: 500 }
+      { error: "Fallo al crear la conversación" },
+      { status: 500 },
     );
   }
 }

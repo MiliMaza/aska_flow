@@ -16,10 +16,9 @@ export async function POST(req: Request) {
     if (!instanceUrl || !apiKey || !workflowJson) {
       return NextResponse.json(
         {
-          error:
-            "Faltan parámetros requeridos: instanceUrl, apiKey, or workflowJson.",
+          error: "Faltan parámetros requeridos.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -45,9 +44,9 @@ export async function POST(req: Request) {
         {
           error: `Fallo al crear el workflow en n8n. Estado: ${
             response.status
-          }. Message: ${errorBody.message || "Unknown error"}`,
+          }. Mensaje: ${errorBody.message || "Error desconocido."}`,
         },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -60,7 +59,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Error in /api/n8n/run-workflow:", error);
-    let errorMessage = "An unexpected error occurred.";
+    let errorMessage = "Ha ocurrido un error inesperado.";
     if (error instanceof Error) {
       errorMessage = error.message;
     }

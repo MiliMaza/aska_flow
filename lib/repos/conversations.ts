@@ -39,7 +39,7 @@ export async function createConversation(input: {
   });
 
   if (result.rows.length === 0) {
-    throw new Error("Failed to create conversation");
+    throw new Error("Fallo al crear la conversación");
   }
 
   return mapConversation(result.rows[0] as unknown as ConversationRow);
@@ -47,7 +47,7 @@ export async function createConversation(input: {
 
 export async function getConversationById(
   conversationId: string,
-  userId: string
+  userId: string,
 ) {
   const result = await db.execute({
     sql: `
@@ -67,7 +67,7 @@ export async function getConversationById(
 }
 
 export async function listConversationsByUser(
-  userId: string
+  userId: string,
 ): Promise<ConversationRecord[]> {
   const result = await db.execute({
     sql: `
@@ -80,14 +80,14 @@ export async function listConversationsByUser(
   });
 
   return result.rows.map((row) =>
-    mapConversation(row as unknown as ConversationRow)
+    mapConversation(row as unknown as ConversationRow),
   );
 }
 
 export async function renameConversation(
   conversationId: string,
   userId: string,
-  title: string | null
+  title: string | null,
 ): Promise<ConversationRecord | null> {
   const result = await db.execute({
     sql: `
@@ -108,7 +108,7 @@ export async function renameConversation(
 
 export async function deleteConversation(
   conversationId: string,
-  userId: string
+  userId: string,
 ) {
   const result = await db.execute({
     sql: `

@@ -79,7 +79,7 @@ export async function appendMessage(input: {
   });
 
   if (result.rows.length === 0) {
-    throw new Error("Failed to insert message");
+    throw new Error("Fallo al insertar el mensaje");
   }
 
   return mapMessage(result.rows[0] as unknown as MessageRow);
@@ -87,7 +87,7 @@ export async function appendMessage(input: {
 
 export async function listMessagesByConversation(
   conversationId: string,
-  options: { limit?: number } = {}
+  options: { limit?: number } = {},
 ): Promise<MessageRecord[]> {
   const { limit } = options;
   const sql = `
