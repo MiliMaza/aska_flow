@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     const {
@@ -33,20 +33,20 @@ export async function POST(req: Request) {
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
-        { error: "The storic messages are required." },
-        { status: 400 }
+        { error: "Se requieren los mensajes históricos." },
+        { status: 400 },
       );
     }
 
     const latestUserInput = messages[messages.length - 1]?.parts.find(
-      (part) => part.type === "text"
+      (part) => part.type === "text",
     )?.text;
 
     if (
       typeof latestUserInput !== "string" ||
       latestUserInput.length > MAX_INPUT_LENGTH
     ) {
-      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+      return NextResponse.json({ error: "Entrada inválida" }, { status: 400 });
     }
 
     const profile = await currentUser();
@@ -65,8 +65,8 @@ export async function POST(req: Request) {
 
       if (!conversation) {
         return NextResponse.json(
-          { error: "Conversation not found" },
-          { status: 404 }
+          { error: "Conversación no encontrada" },
+          { status: 404 },
         );
       }
     }
@@ -152,16 +152,12 @@ export async function POST(req: Request) {
     If the request is not for workflow creation, respond:
     {"error": "I can only help with creating n8n workflows. Please provide automation instructions."}
 
-    For unsafe/invalid requests, respond:
-    {"error": "Request cannot be processed securely."}
-
     ---
     <user_request>
     ${latestUserInput}
     </user_request>
     ---
 
-    After generating the workflow JSON, include a note about any required credentials or configuration steps.
     `,
       messages: convertToModelMessages(messages),
       maxRetries: 0,
@@ -172,8 +168,8 @@ export async function POST(req: Request) {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return NextResponse.json(
-        { error: "Model did not return a valid JSON object." },
-        { status: 500 }
+        { error: "El modelo no devolvió un objeto JSON válido." },
+        { status: 500 },
       );
     }
 
@@ -182,10 +178,10 @@ export async function POST(req: Request) {
       // Check if JSON is valid
       workflowJson = JSON.parse(jsonMatch[0]);
     } catch (error) {
-      console.error("JSON parsing failed:", error);
+      console.error("Fallo en el parseo del JSON:", error);
       return NextResponse.json(
-        { error: "Generated content is not valid JSON." },
-        { status: 500 }
+        { error: "El contenido generado no es un JSON válido." },
+        { status: 500 },
       );
     }
 
@@ -207,17 +203,13 @@ export async function POST(req: Request) {
         });
       }
 
-      console.error(
-        "Schema validation failed:",
-        validationResult.error.flatten()
-      );
+      console.error("Validación fallida:", validationResult.error.flatten());
 
       return NextResponse.json(
         {
-          error:
-            "Generated workflow does not match the required n8n structure.",
+          error: "El workflow no coincide con la estructura requerida de n8n.",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -228,12 +220,12 @@ export async function POST(req: Request) {
     const validationSecurity = securityScan(sanitizedWorkflow);
 
     if (!validationSecurity.isSafe) {
-      console.error("Security scan failed:", validationSecurity.reason);
+      console.error("Scaneo de seguridad fallido:", validationSecurity.reason);
       return NextResponse.json(
         { error: validationSecurity.reason },
         {
           status: 500,
-        }
+        },
       );
     }
 
@@ -258,8 +250,8 @@ export async function POST(req: Request) {
       workflow: workflowRecord,
     });
   } catch (error) {
-    console.error("Error in POST /api/chat:", error);
-    let errorMessage = "An unexpected error occurred.";
+    console.error("Error al intentar crear el workflow:", error);
+    let errorMessage = "Ha ocurrido un error inesperado.";
 
     if (error instanceof Error) {
       errorMessage = error.message;

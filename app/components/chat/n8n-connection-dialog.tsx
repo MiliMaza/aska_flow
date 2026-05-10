@@ -28,6 +28,7 @@ export function N8NConnectionDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(instanceUrl, apiKey);
+    onClose();
     setInstanceUrl("");
     setApiKey("");
   };

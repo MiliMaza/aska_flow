@@ -2,11 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { db } from "@/lib/db";
 
-export type WorkflowStatus =
-  | "pending"
-  | "running"
-  | "failed"
-  | "completed";
+export type WorkflowStatus = "pending" | "running" | "failed" | "completed";
 
 export type WorkflowRecord = {
   id: string;
@@ -74,7 +70,7 @@ export async function createWorkflow(input: {
   });
 
   if (result.rows.length === 0) {
-    throw new Error("Failed to create workflow");
+    throw new Error("Fallo al crear el workflow");
   }
 
   return mapWorkflow(result.rows[0] as unknown as WorkflowRow);
@@ -86,7 +82,7 @@ export async function updateWorkflowStatus(
     status?: WorkflowStatus;
     result?: unknown | null;
     error?: string | null;
-  }
+  },
 ): Promise<WorkflowRecord | null> {
   if (
     !updates.status &&
@@ -134,7 +130,7 @@ export async function updateWorkflowStatus(
 }
 
 export async function listWorkflowsByConversation(
-  conversationId: string
+  conversationId: string,
 ): Promise<WorkflowRecord[]> {
   const result = await db.execute({
     sql: `
@@ -150,7 +146,7 @@ export async function listWorkflowsByConversation(
 }
 
 export async function getWorkflowById(
-  workflowId: string
+  workflowId: string,
 ): Promise<WorkflowRecord | null> {
   const result = await db.execute({
     sql: `

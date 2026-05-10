@@ -13,7 +13,7 @@ class UnauthorizedError extends Error {}
 async function requireUserId() {
   const { userId } = await auth();
   if (!userId) {
-    throw new UnauthorizedError("Unauthorized");
+    throw new UnauthorizedError("Se requiere autenticación.");
   }
   return userId;
 }
@@ -30,7 +30,7 @@ async function ensureConversation(conversationId: string, userId: string) {
 // GET all workflows for a conversation
 export async function GET(
   _request: Request,
-  context: { params: Promise<{ conversationId: string }> }
+  context: { params: Promise<{ conversationId: string }> },
 ) {
   try {
     const userId = await requireUserId();
@@ -39,8 +39,8 @@ export async function GET(
 
     if (!conversation) {
       return NextResponse.json(
-        { error: "Conversation not found" },
-        { status: 404 }
+        { error: "Conversacion no encontrada" },
+        { status: 404 },
       );
     }
 
@@ -51,10 +51,10 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
-    console.error("Failed to fetch workflows", error);
+    console.error("Fallo al leer los workflows", error);
     return NextResponse.json(
       { error: "Fallo al leer los workflows" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -62,7 +62,7 @@ export async function GET(
 // POST (create) a new workflow in a conversation
 export async function POST(
   request: Request,
-  context: { params: Promise<{ conversationId: string }> }
+  context: { params: Promise<{ conversationId: string }> },
 ) {
   try {
     const userId = await requireUserId();
@@ -72,7 +72,7 @@ export async function POST(
     if (!conversation) {
       return NextResponse.json(
         { error: "Conversación no encontrada" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -83,7 +83,7 @@ export async function POST(
       status &&
       !["pending", "running", "failed", "completed"].includes(status)
     ) {
-      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+      return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
     }
 
     const workflow = await createWorkflow({
@@ -99,10 +99,10 @@ export async function POST(
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
-    console.error("Failed to create workflow", error);
+    console.error("Fallo al crear el workflow", error);
     return NextResponse.json(
       { error: "Fallo al crear el workflow" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -36,7 +36,7 @@ export function securityScan(workflow: N8nWorkflow): SecurityScanResult {
     if (DISALLOWED_NODE_TYPES.has(node.type)) {
       return {
         isSafe: false,
-        reason: `Node type "${node.type}" is disallowed for security reasons.`,
+        reason: `El nodo de tipo "${node.type}" está prohibido por razones de seguridad.`,
       };
     }
   }
@@ -48,7 +48,7 @@ export function securityScan(workflow: N8nWorkflow): SecurityScanResult {
     if (pattern.test(workflowString)) {
       return {
         isSafe: false,
-        reason: "Workflow contains a potentially unsafe local URL.",
+        reason: "El workflow contiene una URL potencialmente insegura.",
       };
     }
   }
@@ -57,7 +57,8 @@ export function securityScan(workflow: N8nWorkflow): SecurityScanResult {
     if (pattern.test(workflowString)) {
       return {
         isSafe: false,
-        reason: "Workflow contains a potentially dangerous code expression.",
+        reason:
+          "El workflow contiene una expresión de código potencialmente peligrosa.",
       };
     }
   }

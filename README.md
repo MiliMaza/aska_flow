@@ -25,7 +25,7 @@ Aska Flow es un generador de automatizaciones con IA integrada, centrado en la c
    ```bash
    npm install
    ```
-2. **Crear un archivo para las variables de entorno** 
+2. **Crear un archivo para las variables de entorno**
    Crear `.env.local` con las variables que se describen más abajo.
 3. **Ejecutar el esquema de la base de datos**
    ```bash
@@ -35,7 +35,7 @@ Aska Flow es un generador de automatizaciones con IA integrada, centrado en la c
    ```bash
    npm run dev
    ```
-5. **Abrir la página** 
+5. **Abrir la página**
    En el navegador abrir: [http://localhost:3000](http://localhost:3000).
 
 ### Variables de Entorno
@@ -56,4 +56,5 @@ Aska Flow es un generador de automatizaciones con IA integrada, centrado en la c
 4. Revisa, renombra o elimina conversaciones pasadas desde el panel lateral.
 
 ## Autora
+
 [Milagros Maza](https://github.com/MiliMaza)

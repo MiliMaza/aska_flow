@@ -23,9 +23,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={esES}>
-      <html lang="en">
-        <body className={`${geistSans.variable} antialiased`}>
+    <ClerkProvider localization={esES} afterSignOutUrl={"/auth"}>
+      <html lang="es">
+        <body
+          className={`${geistSans.variable} antialiased`}
+          suppressHydrationWarning
+        >
           <SidebarProvider>{children}</SidebarProvider>
           <Toaster />
         </body>

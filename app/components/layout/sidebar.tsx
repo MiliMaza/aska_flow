@@ -100,12 +100,12 @@ export default function Sidebar({
                               day: "2-digit",
                               month: "short",
                               year: "numeric",
-                            }
+                            },
                           )}
                         </span>
                       </div>
                     </Button>
-                    {/* TODO: Replace these buttons for a predefine component */}
+
                     <button
                       type="button"
                       className="absolute group right-2 top-1/2 -translate-y-1/2 p-1"
@@ -115,7 +115,6 @@ export default function Sidebar({
                         setOpenMenuId(isMenuOpen ? null : conversation.id);
                       }}
                     >
-                      {/* TODO: Change color when hover the conversation button */}
                       <MoreHorizontal className="w-5 h-5 text-foreground hover:scale-125" />
                     </button>
                     {isMenuOpen ? (

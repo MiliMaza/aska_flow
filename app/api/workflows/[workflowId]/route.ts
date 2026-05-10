@@ -13,7 +13,7 @@ class UnauthorizedError extends Error {}
 async function requireUserId() {
   const { userId } = await auth();
   if (!userId) {
-    throw new UnauthorizedError("Unauthorized");
+    throw new UnauthorizedError("No autorizado");
   }
   return userId;
 }
@@ -21,7 +21,7 @@ async function requireUserId() {
 // PATCH (update) workflow's status
 export async function PATCH(
   request: Request,
-  context: { params: Promise<{ workflowId: string }> }
+  context: { params: Promise<{ workflowId: string }> },
 ) {
   try {
     const userId = await requireUserId();
@@ -30,19 +30,19 @@ export async function PATCH(
 
     if (!workflow) {
       return NextResponse.json(
-        { error: "Workflow not found" },
-        { status: 404 }
+        { error: "Workflow no encontrado" },
+        { status: 404 },
       );
     }
 
     const conversation = await getConversationById(
       workflow.conversationId,
-      userId
+      userId,
     );
     if (!conversation) {
       return NextResponse.json(
-        { error: "Not authorized to update this workflow" },
-        { status: 403 }
+        { error: "No estás autorizado para actualizar este workflow" },
+        { status: 403 },
       );
     }
 
@@ -53,7 +53,7 @@ export async function PATCH(
       status &&
       !["pending", "running", "failed", "completed"].includes(status)
     ) {
-      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+      return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
     }
 
     const result = body?.result !== undefined ? body.result : undefined;
@@ -72,8 +72,8 @@ export async function PATCH(
 
     if (!updated) {
       return NextResponse.json(
-        { error: "No update payload provided" },
-        { status: 400 }
+        { error: "No se ha proporcionado payload para actualizar" },
+        { status: 400 },
       );
     }
 
@@ -83,10 +83,10 @@ export async function PATCH(
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
-    console.error("Failed to update workflow", error);
+    console.error("Fallo al actualizar el workflow", error);
     return NextResponse.json(
-      { error: "Failed to update workflow" },
-      { status: 500 }
+      { error: "Fallo al actualizar el workflow" },
+      { status: 500 },
     );
   }
 }

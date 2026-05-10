@@ -14,7 +14,7 @@ class UnauthorizedError extends Error {}
 async function requireUserId() {
   const { userId } = await auth();
   if (!userId) {
-    throw new UnauthorizedError("Unauthorized");
+    throw new UnauthorizedError("No autorizado");
   }
   return userId;
 }
@@ -22,7 +22,7 @@ async function requireUserId() {
 // GET a conversation by ID, including its messages and workflows
 export async function GET(
   _request: Request,
-  context: { params: Promise<{ conversationId: string }> }
+  context: { params: Promise<{ conversationId: string }> },
 ) {
   try {
     const userId = await requireUserId();
@@ -31,8 +31,8 @@ export async function GET(
 
     if (!conversation) {
       return NextResponse.json(
-        { error: "Conversation not found" },
-        { status: 404 }
+        { error: "Conversación no encontrada" },
+        { status: 404 },
       );
     }
 
@@ -51,10 +51,10 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
-    console.error("Failed to fetch conversation", error);
+    console.error("Fallo al cargar la conversación", error);
     return NextResponse.json(
-      { error: "Failed to fetch conversation" },
-      { status: 500 }
+      { error: "Fallo al cargar la conversación" },
+      { status: 500 },
     );
   }
 }
@@ -62,7 +62,7 @@ export async function GET(
 // PATCH (rename) a conversation
 export async function PATCH(
   request: Request,
-  context: { params: Promise<{ conversationId: string }> }
+  context: { params: Promise<{ conversationId: string }> },
 ) {
   try {
     const userId = await requireUserId();
@@ -73,8 +73,8 @@ export async function PATCH(
     const updated = await renameConversation(conversationId, userId, title);
     if (!updated) {
       return NextResponse.json(
-        { error: "Conversation not found" },
-        { status: 404 }
+        { error: "Conversación no encontrada" },
+        { status: 404 },
       );
     }
 
@@ -84,10 +84,10 @@ export async function PATCH(
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
-    console.error("Failed to rename conversation", error);
+    console.error("Fallo al renombrar la conversación", error);
     return NextResponse.json(
-      { error: "Failed to rename conversation" },
-      { status: 500 }
+      { error: "Fallo al renombrar la conversación" },
+      { status: 500 },
     );
   }
 }
@@ -95,7 +95,7 @@ export async function PATCH(
 // DELETE a conversation
 export async function DELETE(
   _request: Request,
-  context: { params: Promise<{ conversationId: string }> }
+  context: { params: Promise<{ conversationId: string }> },
 ) {
   try {
     const userId = await requireUserId();
@@ -104,8 +104,8 @@ export async function DELETE(
 
     if (!removed) {
       return NextResponse.json(
-        { error: "Conversation not found" },
-        { status: 404 }
+        { error: "Conversación no encontrada" },
+        { status: 404 },
       );
     }
 
@@ -115,10 +115,10 @@ export async function DELETE(
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
-    console.error("Failed to delete conversation", error);
+    console.error("Fallo al eliminar la conversación", error);
     return NextResponse.json(
-      { error: "Failed to delete conversation" },
-      { status: 500 }
+      { error: "Fallo al eliminar la conversación" },
+      { status: 500 },
     );
   }
 }

@@ -153,14 +153,14 @@ function PageContent({ initialConversationId }: PageContentProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversations, setConversations] = useState<ConversationSummary[]>(
-    () => conversationsCache ?? []
+    () => conversationsCache ?? [],
   );
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
   >(initialConversationId);
   const [isFetchingConversations, setIsFetchingConversations] = useState(false);
   const [isHydratingConversation, setIsHydratingConversation] = useState(() =>
-    Boolean(initialConversationId)
+    Boolean(initialConversationId),
   );
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
   const [showExamples] = useState(true);
@@ -211,7 +211,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
       }
       router.push(target);
     },
-    [pathname, router]
+    [pathname, router],
   );
 
   const fetchConversations = useCallback(
@@ -229,13 +229,13 @@ function PageContent({ initialConversationId }: PageContentProps) {
         });
 
         if (!response.ok) {
-          throw new Error("The conversations did not load.");
+          throw new Error("Las conversaciones no se pudieron cargar.");
         }
 
         const data = await response.json();
         setConversations(data.conversations ?? []);
       } catch (error) {
-        console.error("Failed to fetch conversations", error);
+        console.error("Fallo al cargar las conversaciones", error);
         toast.error("No se pudieron cargar tus conversaciones.");
       } finally {
         if (shouldShowLoading) {
@@ -243,7 +243,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
         }
       }
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -261,7 +261,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
       });
 
       if (!response.ok) {
-        throw new Error("Conversation not found.");
+        throw new Error("Conversación no encontrada.");
       }
 
       const data = await response.json();
@@ -272,16 +272,16 @@ function PageContent({ initialConversationId }: PageContentProps) {
           role: message.role === "user" ? "user" : "assistant",
           parts: [{ type: "text", text: message.content }],
           workflowId: message.metadata?.workflowId ?? null,
-        }))
+        })),
       );
       const orderedWorkflows = [...(data.workflows ?? [])].sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
       setWorkflows(orderedWorkflows);
       setActiveConversationId(conversationId);
     } catch (error) {
-      console.error("Failed to hydrate conversation", error);
+      console.error("Fallo al cargar la conversación", error);
       toast.error("No se pudo cargar la conversación seleccionada.");
     } finally {
       setIsHydratingConversation(false);
@@ -315,7 +315,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
       }
       navigateToConversation(conversationId);
     },
-    [activeConversationId, navigateToConversation]
+    [activeConversationId, navigateToConversation],
   );
 
   const upsertConversationInState = useCallback(
@@ -330,7 +330,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
         return [conversation, ...updated];
       });
     },
-    []
+    [],
   );
 
   const handleNewConversation = useCallback(() => {
@@ -349,7 +349,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
       });
       setRenameInputValue(target?.title ?? "");
     },
-    [conversations]
+    [conversations],
   );
 
   const handleConfirmRenameConversation = useCallback(async () => {
@@ -366,11 +366,11 @@ function PageContent({ initialConversationId }: PageContentProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ title: trimmed || null }),
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error("The conversation could not be rename.");
+        throw new Error("La conversación no pudo ser renombrada.");
       }
 
       const data = await response.json();
@@ -378,11 +378,11 @@ function PageContent({ initialConversationId }: PageContentProps) {
       toast.success("Conversación renombrada.");
       closeRenameDialog();
     } catch (error) {
-      console.error("Failed to rename conversation:", error);
+      console.error("Fallo al renombrar la conversación:", error);
       toast.error(
         error instanceof Error
           ? error.message
-          : "No se pudo renombrar la conversación."
+          : "No se pudo renombrar la conversación.",
       );
     } finally {
       setIsRenamingConversation(false);
@@ -402,7 +402,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
         title: target?.title ?? null,
       });
     },
-    [conversations]
+    [conversations],
   );
 
   const handleConfirmDeleteConversation = useCallback(async () => {
@@ -416,11 +416,11 @@ function PageContent({ initialConversationId }: PageContentProps) {
       });
 
       if (!response.ok) {
-        throw new Error("The conversation could not be delete.");
+        throw new Error("La conversación no pudo ser eliminada.");
       }
 
       setConversations((prev) =>
-        prev.filter((item) => item.id !== conversationId)
+        prev.filter((item) => item.id !== conversationId),
       );
 
       if (activeConversationId === conversationId) {
@@ -430,11 +430,11 @@ function PageContent({ initialConversationId }: PageContentProps) {
       toast.success("Conversación eliminada.");
       closeDeleteDialog();
     } catch (error) {
-      console.error("Failed to delete conversation:", error);
+      console.error("Fallo al eliminar la conversación:", error);
       toast.error(
         error instanceof Error
           ? error.message
-          : "No se pudo eliminar la conversación."
+          : "No se pudo eliminar la conversación.",
       );
     } finally {
       setIsDeletingConversation(false);
@@ -468,7 +468,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
 
     if (!response.ok) {
       throw new Error(
-        "It was not possible to create a conversation to save the workflow."
+        "No fue posible crear una conversación para guardar el workflow.",
       );
     }
 
@@ -494,7 +494,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
       setWorkflowToRunId(options?.workflowId ?? null);
       setShowN8NDialog(true);
     },
-    [setWorkflowToRun, setWorkflowToRunId, setShowN8NDialog]
+    [setWorkflowToRun, setWorkflowToRunId, setShowN8NDialog],
   );
 
   const workflowMessageMap = useMemo(() => {
@@ -515,12 +515,12 @@ function PageContent({ initialConversationId }: PageContentProps) {
         setHighlightedMessageId(messageId);
         setTimeout(() => {
           setHighlightedMessageId((current) =>
-            current === messageId ? null : current
+            current === messageId ? null : current,
           );
         }, 2000);
       }
     },
-    [messageRefs]
+    [messageRefs],
   );
 
   const scrollToWorkflow = useCallback(
@@ -531,12 +531,12 @@ function PageContent({ initialConversationId }: PageContentProps) {
         setHighlightedWorkflowId(workflowId);
         setTimeout(() => {
           setHighlightedWorkflowId((current) =>
-            current === workflowId ? null : current
+            current === workflowId ? null : current,
           );
         }, 2000);
       }
     },
-    [workflowRefs]
+    [workflowRefs],
   );
 
   const handleCopyWorkflow = useCallback((workflow: WorkflowSummary) => {
@@ -561,7 +561,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
       }
       prepareWorkflowRun(payload, { workflowId: workflow.id });
     },
-    [prepareWorkflowRun]
+    [prepareWorkflowRun],
   );
 
   const getWorkflowTitle = useCallback((workflow: WorkflowSummary) => {
@@ -583,7 +583,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
 
     const finalizeWorkflow = async (
       status: WorkflowStatus,
-      errorMessage?: string | null
+      errorMessage?: string | null,
     ) => {
       if (!workflowRecord) return;
       try {
@@ -605,7 +605,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
           upsertWorkflow(data.workflow);
         }
       } catch (error) {
-        console.error("Failed to update workflow status", error);
+        console.error("Fallo al actualizar el estado del workflow", error);
       }
     };
 
@@ -624,7 +624,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
         });
 
         if (!response.ok) {
-          throw new Error("The workflow could not be update.");
+          throw new Error("El workflow no pudo ser actualizado.");
         }
 
         const data = await response.json();
@@ -645,11 +645,13 @@ function PageContent({ initialConversationId }: PageContentProps) {
             status: "running",
             result: workflowToRun,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error("The workflow could not be save before the execution.");
+        throw new Error(
+          "El workflow no pudo ser guardado antes de ejecutarlo.",
+        );
       }
 
       const data = await response.json();
@@ -661,11 +663,11 @@ function PageContent({ initialConversationId }: PageContentProps) {
     try {
       workflowRecord = await ensureWorkflowRecord();
     } catch (error) {
-      console.error("Workflow persistence failed:", error);
+      console.error("Fallo en la persistencia del workflow:", error);
       toast.error(
         error instanceof Error
           ? error.message
-          : "No se pudo registrar el workflow antes de ejecutarlo."
+          : "No se pudo registrar el workflow antes de ejecutarlo.",
       );
       return;
     }
@@ -688,7 +690,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
       if (!response.ok) {
         await finalizeWorkflow(
           "failed",
-          result.error || "Error in the n8n conection."
+          result.error || "Error al conectar con n8n.",
         );
         toast.error(result.error || "Fallo al conectarse a n8n.");
         return;
@@ -701,12 +703,12 @@ function PageContent({ initialConversationId }: PageContentProps) {
       setWorkflowToRun(null);
       setWorkflowToRunId(null);
     } catch (error) {
-      console.error("Failed to run workflow:", error);
+      console.error("Fallo al ejecutar el workflow:", error);
       await finalizeWorkflow(
         "failed",
         error instanceof Error
           ? error.message
-          : "Unexpected error while executing the workflow."
+          : "Error inesperado al ejecutar el workflow.",
       );
       toast.error("Un error inesperado ha ocurrido al conectarse a n8n.");
     }
@@ -742,7 +744,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "An unknown error occured.");
+        throw new Error(errorData.error || "Error desconocido.");
       }
 
       const data = await response.json();
@@ -776,11 +778,11 @@ function PageContent({ initialConversationId }: PageContentProps) {
         upsertWorkflow(data.workflow);
       }
     } catch (error) {
-      console.error("Failed to process chat message:", error);
+      console.error("Fallo al procesar el mensaje:", error);
       toast.error(
         error instanceof Error
           ? error.message
-          : "Fallo al conectarse al servidor."
+          : "Fallo al conectarse al servidor.",
       );
       fetchConversations();
     } finally {
@@ -923,17 +925,17 @@ function PageContent({ initialConversationId }: PageContentProps) {
                                                 try {
                                                   const jsonMatch =
                                                     part.text.match(
-                                                      /\{[\s\S]*\}/
+                                                      /\{[\s\S]*\}/,
                                                     );
                                                   if (!jsonMatch)
                                                     return part.text;
                                                   const parsed = JSON.parse(
-                                                    jsonMatch[0]
+                                                    jsonMatch[0],
                                                   );
                                                   return JSON.stringify(
                                                     parsed,
                                                     null,
-                                                    2
+                                                    2,
                                                   );
                                                 } catch {
                                                   return part.text;
@@ -956,7 +958,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
                                                   // Find JSON in the message
                                                   const jsonMatch =
                                                     part.text.match(
-                                                      /\{[\s\S]*\}/
+                                                      /\{[\s\S]*\}/,
                                                     );
                                                   if (jsonMatch) {
                                                     // Copy JSON to clipboard
@@ -964,12 +966,12 @@ function PageContent({ initialConversationId }: PageContentProps) {
                                                       .writeText(jsonMatch[0])
                                                       .then(() => {
                                                         toast.success(
-                                                          "Workflow copiado!"
+                                                          "Workflow copiado!",
                                                         );
                                                       })
                                                       .catch(() => {
                                                         toast.error(
-                                                          "Fallo al copiar workflow"
+                                                          "Fallo al copiar workflow",
                                                         );
                                                       });
                                                   }
@@ -989,33 +991,33 @@ function PageContent({ initialConversationId }: PageContentProps) {
                                                 onClick={() => {
                                                   const jsonMatch =
                                                     part.text.match(
-                                                      /\{[\s\S]*\}/
+                                                      /\{[\s\S]*\}/,
                                                     );
                                                   if (jsonMatch) {
                                                     try {
                                                       const workflowJson =
                                                         JSON.parse(
-                                                          jsonMatch[0]
+                                                          jsonMatch[0],
                                                         );
                                                       prepareWorkflowRun(
                                                         workflowJson,
                                                         {
                                                           workflowId:
                                                             message.workflowId,
-                                                        }
+                                                        },
                                                       );
                                                     } catch (error) {
                                                       toast.error(
-                                                        "Fallo al obtener el JSON del workflow."
+                                                        "Fallo al obtener el JSON del workflow.",
                                                       );
                                                       console.error(
-                                                        "JSON parsing error:",
-                                                        error
+                                                        "Error al analizar el JSON:",
+                                                        error,
                                                       );
                                                     }
                                                   } else {
                                                     toast.error(
-                                                      "No se ha encontrado un JSON válido en el mensaje."
+                                                      "No se ha encontrado un JSON válido en el mensaje.",
                                                     );
                                                   }
                                                 }}
@@ -1036,7 +1038,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
                                                   label="Ver Workflow guardado"
                                                   onClick={() =>
                                                     scrollToWorkflow(
-                                                      message.workflowId!
+                                                      message.workflowId!,
                                                     )
                                                   }
                                                 >
@@ -1105,7 +1107,7 @@ function PageContent({ initialConversationId }: PageContentProps) {
                     const messageId = workflowMessageMap.get(workflow.id);
                     const isHighlighted = highlightedWorkflowId === workflow.id;
                     const workflowError = normalizeWorkflowError(
-                      workflow.error
+                      workflow.error,
                     );
                     return (
                       <div
